@@ -1,0 +1,18 @@
+{
+  "albums": [
+    {
+      "slug": "moonhunt",
+      "title": "MoonHunt",
+      "year": "2025",
+      "photos": [
+        {
+          "src": "/photos/moonhunt/mg-1345.webp",
+          "width": 2560,
+          "height": 1707,
+          "blurDataURL": "data:image/webp;base64,UklGRjgAAABXRUJQVlA4ICwAAACwAgCdASoYABAAPxFysFAsJqSisAgBgCIJaQAAeyAA/vBTiSC+xPh+DgAAAA==",
+          "exif": "Canon EOS 5D Mark II · 200mm · f/9 · 1/40 · ISO 125"
+        }
+      ]
+    }
+  ]
+}

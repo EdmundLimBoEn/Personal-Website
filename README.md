@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# edmundlim.systems
 
-## Getting Started
+Personal portfolio — photographer · vibe coder · tech enthusiast.
 
-First, run the development server:
+Dark, photo-first design: near-black canvas, photos carry the color, terminal-styled
+projects section. Fully static — no DB, no CMS.
+
+**Stack:** Next.js (App Router) · TypeScript · Tailwind 4 · Bun · Vercel
+
+## Develop
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+bun install
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Adding photos
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The site never reads the NAS at runtime. It renders only from `content/photos.json`,
+which is generated from a curated set of originals:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Drop picks into `photos-src/<Album Name>/*.jpg` — the folder name becomes the
+   album title. `photos-src/` is gitignored (originals stay local).
+2. Run `bun run photos`. For each image this:
+   - resizes to max 2560px and re-encodes as WebP into `public/photos/<album-slug>/`
+   - **strips all EXIF/GPS metadata** from the published file
+   - records only camera/exposure info (never GPS) in the manifest for captions
+3. Commit `content/photos.json` and `public/photos/` — both are checked in so
+   builds are deterministic.
 
-## Learn More
+Folders named `close ups` (any spelling) are refused by a hard-coded denylist and
+will never be published.
 
-To learn more about Next.js, take a look at the following resources:
+The hero image is the first photo of the first album (albums and files sort
+alphabetically) — rename files to control ordering.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Projects list
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Hand-edited in `content/projects.ts`.
 
-## Deploy on Vercel
+## Deploy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+bunx vercel          # preview
+bunx vercel --prod   # production
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Domain: `edmundlim.systems` (root). The timetable stays at
+`timetable.edmundlim.systems`.
