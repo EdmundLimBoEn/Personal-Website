@@ -2,6 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { PROJECTS, GITHUB_PROFILE, EMAIL } from "@/content/projects";
 import { getHeroPhoto, getStripPhotos, getAlbums, totalPhotoCount } from "@/lib/photos";
+import Reveal from "@/components/motion/Reveal";
+import Parallax from "@/components/motion/Parallax";
+import Magnetic from "@/components/motion/Magnetic";
+import FloatingLetters from "@/components/motion/FloatingLetters";
+import { LazyHeroScene, LazyPhotoPile, type PrintPhoto } from "@/components/motion/LazyScene";
 
 function Brackets() {
   return (
@@ -19,7 +24,7 @@ function Hero() {
   return (
     <section className="relative flex min-h-svh flex-col justify-end overflow-hidden">
       {hero && (
-        <>
+        <Parallax speed={0.3} className="absolute inset-0">
           <Image
             src={hero.photo.src}
             alt={`Photograph from ${hero.album.title}`}
@@ -31,8 +36,11 @@ function Hero() {
             className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-bg/20" />
-        </>
+        </Parallax>
       )}
+
+      {/* floating zero-G layer: HUD chips, brackets, particle drift */}
+      <LazyHeroScene />
 
       {/* viewfinder frame */}
       <div className="focus-frame pointer-events-none absolute inset-4 sm:inset-6">
@@ -48,12 +56,13 @@ function Hero() {
           Singapore — student, media club
         </p>
         <h1
+          aria-label="Edmund Lim"
           className="rise font-display text-[17vw] leading-[0.85] tracking-tight sm:text-[11rem]"
           style={{ "--rise-delay": "0.25s" } as React.CSSProperties}
         >
-          Edmund
+          <FloatingLetters text="Edmund" />
           <br />
-          <span className="italic font-light">Lim</span>
+          <FloatingLetters text="Lim" className="italic font-light" />
         </h1>
         <p
           className="rise mt-8 max-w-md font-mono text-sm leading-relaxed text-dim"
@@ -79,24 +88,27 @@ function PhotoStrip() {
   const albums = getAlbums();
   return (
     <section className="border-t border-line">
-      <div className="flex items-baseline justify-between px-6 pt-14 pb-8 sm:px-12">
+      <Reveal className="flex items-baseline justify-between px-6 pt-14 pb-8 sm:px-12">
         <h2 className="font-mono text-[11px] uppercase tracking-[0.3em] text-dim">
           01 <span className="text-accent">/</span> Photos
         </h2>
-        <Link
-          href="/photos"
-          className="font-mono text-[11px] uppercase tracking-[0.2em] text-dim hover:text-accent transition-colors"
-        >
-          all albums →
-        </Link>
-      </div>
+        <Magnetic>
+          <Link
+            href="/photos"
+            className="font-mono text-[11px] uppercase tracking-[0.2em] text-dim hover:text-accent transition-colors"
+          >
+            all albums →
+          </Link>
+        </Magnetic>
+      </Reveal>
 
       {strip.length > 0 ? (
-        <div className="strip flex gap-2 overflow-x-auto px-6 pb-14 sm:px-12">
+        <Reveal delay={0.1} className="strip flex gap-2 overflow-x-auto px-6 pb-14 sm:px-12">
           {strip.map(({ photo, album }) => (
             <Link
               key={photo.src}
               href={`/photos/${album.slug}`}
+              data-cursor="photo"
               className="group relative shrink-0"
             >
               <Image
@@ -114,7 +126,7 @@ function PhotoStrip() {
               </span>
             </Link>
           ))}
-        </div>
+        </Reveal>
       ) : (
         <div className="px-6 pb-14 sm:px-12">
           <div className="focus-frame flex h-[280px] items-center justify-center border border-dashed border-line sm:h-[360px]">
@@ -129,16 +141,27 @@ function PhotoStrip() {
   );
 }
 
+function Darkroom() {
+  const prints: PrintPhoto[] = getStripPhotos(14).map(({ photo, album }) => ({
+    src: photo.src,
+    width: photo.width,
+    height: photo.height,
+    album: album.slug,
+    title: album.title,
+  }));
+  return <LazyPhotoPile prints={prints} />;
+}
+
 function Projects() {
   return (
     <section id="projects" className="border-t border-line scroll-mt-14">
-      <div className="px-6 pt-14 pb-8 sm:px-12">
+      <Reveal className="px-6 pt-14 pb-8 sm:px-12">
         <h2 className="font-mono text-[11px] uppercase tracking-[0.3em] text-dim">
           02 <span className="text-accent">/</span> Projects
         </h2>
-      </div>
+      </Reveal>
 
-      <div className="mx-6 mb-14 border border-line sm:mx-12">
+      <Reveal delay={0.08} className="mx-6 mb-14 border border-line sm:mx-12">
         {/* terminal title bar */}
         <div className="flex items-center gap-2 border-b border-line px-4 py-2.5">
           <span className="size-2.5 rounded-full border border-line" />
@@ -191,7 +214,7 @@ function Projects() {
           <span className="text-accent">$</span> open {GITHUB_PROFILE.replace("https://", "")}
           <span className="blink ml-1 inline-block h-[0.95em] w-[0.55em] translate-y-[2px] bg-ink" />
         </p>
-      </div>
+      </Reveal>
     </section>
   );
 }
@@ -200,15 +223,15 @@ function About() {
   const count = totalPhotoCount();
   return (
     <section id="about" className="border-t border-line scroll-mt-14">
-      <div className="px-6 pt-14 pb-8 sm:px-12">
+      <Reveal className="px-6 pt-14 pb-8 sm:px-12">
         <h2 className="font-mono text-[11px] uppercase tracking-[0.3em] text-dim">
           03 <span className="text-accent">/</span> About
         </h2>
-      </div>
-      <div className="grid gap-10 px-6 pb-20 sm:grid-cols-[1.4fr_1fr] sm:px-12">
+      </Reveal>
+      <Reveal delay={0.08} className="grid gap-10 px-6 pb-20 sm:grid-cols-[1.4fr_1fr] sm:px-12">
         <p className="font-display text-3xl leading-snug sm:text-5xl">
-          I shoot school halls, airshows and{" "}
-          <span className="italic text-accent">the moon</span> — and I ship small tools
+          I photograph whatever catches my{" "}
+          <span className="italic text-accent">eye</span> — and ship small tools
           that scratch my own itches.
         </p>
         <div className="flex flex-col gap-4 font-mono text-xs leading-loose text-dim sm:pt-2">
@@ -240,7 +263,7 @@ function About() {
             </a>
           </div>
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }
@@ -250,6 +273,7 @@ export default function Home() {
     <>
       <Hero />
       <PhotoStrip />
+      <Darkroom />
       <Projects />
       <About />
     </>

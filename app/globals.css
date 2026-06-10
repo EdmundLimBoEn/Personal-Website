@@ -104,6 +104,119 @@ body {
   .rise { animation: none; opacity: 1; }
 }
 
+/* ---- scroll-triggered reveal ---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ---- viewfinder cursor ---- */
+@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  body.has-custom-cursor,
+  body.has-custom-cursor * {
+    cursor: none !important;
+  }
+}
+.vf-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  width: 34px;
+  height: 34px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s;
+  mix-blend-mode: difference;
+}
+.vf-cursor.on {
+  opacity: 1;
+}
+.vf-cursor .vfc {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 0 solid #fff;
+  transition: border-color 0.2s;
+}
+.vf-cursor .vfc.tl { top: 0; left: 0; border-top-width: 1.5px; border-left-width: 1.5px; }
+.vf-cursor .vfc.tr { top: 0; right: 0; border-top-width: 1.5px; border-right-width: 1.5px; }
+.vf-cursor .vfc.bl { bottom: 0; left: 0; border-bottom-width: 1.5px; border-left-width: 1.5px; }
+.vf-cursor .vfc.br { bottom: 0; right: 0; border-bottom-width: 1.5px; border-right-width: 1.5px; }
+.vf-cursor .vfc-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  margin: -1.5px 0 0 -1.5px;
+  border-radius: 50%;
+  background: #fff;
+}
+.vf-cursor .vfc-label {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translate(-50%, 7px);
+  font-family: var(--font-plex), monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+.vf-cursor[data-mode="drag"] .vfc-label {
+  opacity: 1;
+}
+.vf-cursor[data-mode="drag"] .vfc-label::after {
+  content: "DRAG";
+}
+.vf-cursor[data-mode="photo"] .vfc-dot,
+.vf-cursor[data-mode="drag"] .vfc-dot {
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 0;
+  background: transparent;
+  outline: 1.5px solid #fff;
+}
+
+/* ---- lightbox entry ---- */
+@keyframes lb-in {
+  from {
+    opacity: 0;
+    transform: scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.lightbox-enter {
+  animation: lb-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .lightbox-enter {
+    animation: none;
+  }
+}
+
 /* ---- horizontal photo strip ---- */
 .strip {
   scrollbar-width: none;

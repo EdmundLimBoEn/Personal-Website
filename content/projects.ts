@@ -40,14 +40,6 @@ export const PROJECTS: Project[] = [
     github: "https://github.com/EdmundLimBoEn/mts-converter",
   },
   {
-    slug: "stock-analysis-suite",
-    name: "stock-analysis-suite",
-    tagline:
-      "Claude Code skill + local MCP server that writes institutional-style equity research notes for any stock — 11 live-data tools, no API key.",
-    stack: ["python", "mcp", "claude code"],
-    year: "2026",
-  },
-  {
     slug: "server-dashboard",
     name: "server-dashboard",
     tagline:
@@ -56,15 +48,7 @@ export const PROJECTS: Project[] = [
     year: "2025",
     github: "https://github.com/EdmundLimBoEn/server-dashboard",
   },
-  {
-    slug: "emailtracker",
-    name: "emailtracker",
-    tagline:
-      "1×1 transparent-pixel email open tracker with a dashboard — and an honest README about why pixels are a signal, not proof.",
-    stack: ["node.js", "caddy"],
-    year: "2026",
-  },
-  {
+ {
     slug: "statusline-builder",
     name: "statusline-builder",
     tagline:

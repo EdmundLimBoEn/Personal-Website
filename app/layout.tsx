@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Fraunces, Archivo, IBM_Plex_Mono } from "next/font/google";
 import Link from "next/link";
 import { GITHUB_PROFILE, EMAIL } from "@/content/projects";
+import SmoothScroll from "@/components/motion/SmoothScroll";
+import Cursor from "@/components/motion/Cursor";
+import Magnetic from "@/components/motion/Magnetic";
+import { MotionProvider, FxToggle } from "@/components/motion/MotionMode";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -42,19 +46,28 @@ function Nav() {
   return (
     <header className="fixed inset-x-0 top-0 z-40 mix-blend-difference">
       <nav className="flex items-baseline justify-between px-5 py-4 font-mono text-[11px] uppercase tracking-[0.2em] sm:px-8">
-        <Link href="/" className="text-ink hover:text-accent transition-colors">
-          EL<span className="text-accent">—</span>26
-        </Link>
+        <Magnetic>
+          <Link href="/" className="text-ink hover:text-accent transition-colors">
+            EL<span className="text-accent">—</span>26
+          </Link>
+        </Magnetic>
         <div className="flex gap-6 sm:gap-10">
-          <Link href="/photos" className="text-ink hover:text-accent transition-colors">
-            Photos
-          </Link>
-          <Link href="/#projects" className="text-ink hover:text-accent transition-colors">
-            Projects
-          </Link>
-          <Link href="/#about" className="text-ink hover:text-accent transition-colors">
-            About
-          </Link>
+          <FxToggle />
+          <Magnetic>
+            <Link href="/photos" className="text-ink hover:text-accent transition-colors">
+              Photos
+            </Link>
+          </Magnetic>
+          <Magnetic>
+            <Link href="/#projects" className="text-ink hover:text-accent transition-colors">
+              Projects
+            </Link>
+          </Magnetic>
+          <Magnetic>
+            <Link href="/#about" className="text-ink hover:text-accent transition-colors">
+              About
+            </Link>
+          </Magnetic>
         </div>
         <span className="hidden text-dim sm:block">SG · UTC+8</span>
       </nav>
@@ -92,10 +105,14 @@ export default function RootLayout({
       lang="en"
       className={`${fraunces.variable} ${archivo.variable} ${plex.variable} h-full antialiased`}
     >
-      <body className="grain min-h-full flex flex-col">
-        <Nav />
-        <main className="flex-1">{children}</main>
-        <Footer />
+      <body className="grain min-h-full flex flex-col" suppressHydrationWarning>
+        <MotionProvider>
+          <SmoothScroll />
+          <Cursor />
+          <Nav />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </MotionProvider>
       </body>
     </html>
   );

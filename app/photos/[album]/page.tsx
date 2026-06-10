@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import Gallery from "@/components/Gallery";
+import AlbumNavLinks from "@/components/AlbumNavLinks";
+import Reveal from "@/components/motion/Reveal";
 import { getAlbum, getAlbums } from "@/lib/photos";
 
 export const dynamicParams = false;
@@ -35,13 +36,8 @@ export default async function AlbumPage({
 
   return (
     <div className="px-4 pt-28 pb-20 sm:px-8">
-      <div className="mb-10 px-2 sm:px-4">
-        <Link
-          href="/photos"
-          className="font-mono text-[11px] uppercase tracking-[0.2em] text-dim hover:text-accent transition-colors"
-        >
-          ← all albums
-        </Link>
+      <Reveal className="mb-10 px-2 sm:px-4">
+        <AlbumNavLinks />
         <h1 className="mt-4 font-display text-4xl tracking-tight sm:text-6xl">
           {album.title}
         </h1>
@@ -49,7 +45,7 @@ export default async function AlbumPage({
           {album.photos.length} frame{album.photos.length === 1 ? "" : "s"}
           {album.year ? ` · ${album.year}` : ""}
         </p>
-      </div>
+      </Reveal>
       <Gallery photos={album.photos} albumTitle={album.title} />
     </div>
   );

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getAlbums } from "@/lib/photos";
+import Reveal from "@/components/motion/Reveal";
 
 export const metadata: Metadata = {
   title: "Photos",
@@ -34,7 +35,8 @@ export default function PhotosPage() {
           {albums.map((album, i) => {
             const cover = album.photos[0];
             return (
-              <Link key={album.slug} href={`/photos/${album.slug}`} className="group">
+              <Reveal key={album.slug} delay={(i % 3) * 0.08}>
+                <Link href={`/photos/${album.slug}`} data-cursor="photo" className="group">
                 <div className="overflow-hidden border border-line">
                   <Image
                     src={cover.src}
@@ -57,7 +59,8 @@ export default function PhotosPage() {
                     {album.year ? ` · ${album.year}` : ""}
                   </span>
                 </div>
-              </Link>
+                </Link>
+              </Reveal>
             );
           })}
         </div>

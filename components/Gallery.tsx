@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
+import Reveal from "@/components/motion/Reveal";
 import type { Photo } from "@/lib/photos";
 
 export default function Gallery({
@@ -41,29 +42,31 @@ export default function Gallery({
     <>
       <div className="masonry">
         {photos.map((photo, i) => (
-          <button
-            key={photo.src}
-            onClick={() => setOpen(i)}
-            className="group mb-2 block w-full cursor-zoom-in"
-            aria-label={`Open photo ${i + 1} of ${photos.length}`}
-          >
-            <Image
-              src={photo.src}
-              alt={`Photograph ${i + 1} from ${albumTitle}`}
-              width={photo.width}
-              height={photo.height}
-              placeholder="blur"
-              blurDataURL={photo.blurDataURL}
-              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-              className="w-full transition-opacity duration-300 group-hover:opacity-80"
-            />
-          </button>
+          <Reveal key={photo.src} delay={(i % 3) * 0.07} className="mb-2 break-inside-avoid">
+            <button
+              onClick={() => setOpen(i)}
+              data-cursor="photo"
+              className="group block w-full cursor-zoom-in"
+              aria-label={`Open photo ${i + 1} of ${photos.length}`}
+            >
+              <Image
+                src={photo.src}
+                alt={`Photograph ${i + 1} from ${albumTitle}`}
+                width={photo.width}
+                height={photo.height}
+                placeholder="blur"
+                blurDataURL={photo.blurDataURL}
+                sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                className="w-full transition-opacity duration-300 group-hover:opacity-80"
+              />
+            </button>
+          </Reveal>
         ))}
       </div>
 
       {open !== null && (
         <div
-          className="fixed inset-0 z-[60] flex flex-col bg-bg"
+          className="lightbox-enter fixed inset-0 z-[60] flex flex-col bg-bg"
           role="dialog"
           aria-modal="true"
           aria-label={`${albumTitle} — photo viewer`}

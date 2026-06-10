@@ -1,6 +1,69 @@
 {
   "albums": [
     {
+      "slug": "football",
+      "title": "FOOTBALL",
+      "year": "2026",
+      "photos": [
+        {
+          "src": "/photos/football/bf3i0115.webp",
+          "width": 2560,
+          "height": 1707,
+          "blurDataURL": "data:image/webp;base64,UklGRqQAAABXRUJQVlA4IJgAAAAwBACdASoYABAAPxFysFAsJqSisAgBgCIJagCsIEy4ABNH8yjKj7pVZIAA/t7by/+q2gNzH7eMt+xCojd8S4bFMrDtfl5NmtI5kFJ5n658RK6k2EqyoQ/J/AY/sWJcS3pjsQWdBI90uF3PO6lg5djN5wX/Ff+b02kBHwvZEe6zreEPLBjATlr5ebojlLutduX8Gd5uXpXgAA==",
+          "exif": "Canon EOS-1D X · 70mm · f/4.5 · 1/1600 · ISO 400"
+        },
+        {
+          "src": "/photos/football/bf3i0014.webp",
+          "width": 1707,
+          "height": 2560,
+          "blurDataURL": "data:image/webp;base64,UklGRpwAAABXRUJQVlA4IJAAAACQBACdASoYACQAPwVqrFArpaQitVv4AXAgiUAAG/CI8K3s1LzY7xe+dNrqueAA/lE0nI7d4BHucgf8kcaTFc/fwt55B89AHchPuP4MbSN4A3PglFZQDPblYKDCgkWSUoZnivCS2rnLM/08DP0kx8E/li+Ws0R3i1VSfaEj1wGhGZtCK2l6hXbMUh3Lf4aYAAA=",
+          "exif": "Canon EOS-1D X · 200mm · f/4.5 · 1/1600 · ISO 160"
+        },
+        {
+          "src": "/photos/football/football-19-5-12.webp",
+          "width": 2560,
+          "height": 2428,
+          "blurDataURL": "data:image/webp;base64,UklGRqwAAABXRUJQVlA4IKAAAADQBACdASoYABcAPxF6s1QsJ6QjKAqpgCIJbACvDA9lDrSNM4Hohk1bn22vbjuwAAD+0O96mWHOV13TurjASbn7mMBhsIyUulWAWkoCExrL0LpShPcNdUWk+mMrKLc7SriPRo3/H/0fQKksPdxzqKCbG/c3gTu1pX3M/iUoAFXOEu9LLupIqvW89I1RLO1/wHOMN52551uywTICijC7dAAA",
+          "exif": "Canon EOS-1D X · 160mm · f/4 · 1/1600 · ISO 640"
+        },
+        {
+          "src": "/photos/football/football-19-5-14.webp",
+          "width": 2313,
+          "height": 2400,
+          "blurDataURL": "data:image/webp;base64,UklGRqAAAABXRUJQVlA4IJQAAABwBACdASoYABkAPxF+t1WsJ6UjKAgBgCIJYgDE2ArAyQr5L3BnsRlpO0AsAAD+FcIOxoavNWN+dyowkxeqyMuqf3x5hU7kx4dyyZZsFx95R0GKGNOpodY16mPJWAflgCEw5g6XQI43tN6cqa1XEu0S2B0ase4v9a0BdUUqqy1qTkjsQkyaMsV7+FHZBUqzQmsAwAAA",
+          "exif": "Canon EOS-1D X · 192mm · f/4.5 · 1/1600 · ISO 640"
+        },
+        {
+          "src": "/photos/football/football-19-5-15img-9270.webp",
+          "width": 2560,
+          "height": 1707,
+          "blurDataURL": "data:image/webp;base64,UklGRmAAAABXRUJQVlA4IFQAAABQAwCdASoYABAAPxFysVCsJqSisAgBgCIJQBOgBFN9P1hZuAD6lDxEuG0hDVMDE2M7IbPfUY2Q7ZxVV5fneJ6WKnOVho1CiFTF9Oli/TEcqwsAAAA=",
+          "exif": "Canon EOS 600D · 93mm · f/4 · 1/1000 · ISO 160"
+        },
+        {
+          "src": "/photos/football/football-19-5-17.webp",
+          "width": 2560,
+          "height": 1621,
+          "blurDataURL": "data:image/webp;base64,UklGRnIAAABXRUJQVlA4IGYAAACQAwCdASoYAA8APxFysFAsJqSisAgBgCIJQBYdhDzNS1S5OzcAAP6p+rC/mOwmvU+vMsfPU+8ifO5RGWQDbr29FTk/pSITVqEu40+/u2wUYihykLvpG3MOFGoJyBGGXseTgnFgAAA=",
+          "exif": "Canon EOS-1D X · 70mm · f/4.5 · 1/1600 · ISO 800"
+        },
+        {
+          "src": "/photos/football/football-19-5-2.webp",
+          "width": 1707,
+          "height": 2560,
+          "blurDataURL": "data:image/webp;base64,UklGRkwBAABXRUJQVlA4IEABAAAQCACdASoYACQAPxF6slKsJ6SiqqoBgCIJaADIBIrIx/5kkLGLAAAPILvdIW4RkRqoKgvLX6H/am/WRNwwU44ieStxNctO530AAP2S4Di/mFNiTQOBxEudFC0SPpthqShLFaCY38PVp40ti4FrEdVnHK1SPBA9XeVyhFjyMqH1Nbx6hesJwrV+pb11fsiFiNwqrFm0jF+5igQd0GCsMiMaQOHItH0cCiRYbCUp3q9lvBYChml6cQHYyoCQXliqCuJQarAnt1CgslnFTfo1DAoUKY7Emvt8U5uRs5pZVO6ZF3gNHEUWu0QlhpQ6Fgl0nZ9obu4eLKHzRh5J/vfJkjMDESKfRRXtM0mwpiuJVp1HB+CeX3tslJf+GqjMcF1opYpGj7JFh7qru5Lg+6755RTU22N5TnC8Aul2756IUy9wAA==",
+          "exif": "Canon EOS-1D X · 185mm · f/4.5 · 1/1600 · ISO 32000"
+        },
+        {
+          "src": "/photos/football/img-9790.webp",
+          "width": 2560,
+          "height": 1707,
+          "blurDataURL": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAACQAwCdASoYABAAPxFysVAsJqSisAgBgCIJZAC2yBVabjGvK+IAAP6lgG3OOK2ql3c9Deq+W3DHc3CmBIO4fN1PTBkFE76PWL/50XO2TGeLC6ZI3kMXht/qBO2IkX+gbHRWfZxODv8IAA==",
+          "exif": "Canon EOS 600D · 200mm · f/4 · 1/1600 · ISO 160"
+        }
+      ]
+    },
+    {
       "slug": "moonhunt",
       "title": "MoonHunt",
       "year": "2025",
@@ -11,6 +74,97 @@
           "height": 1707,
           "blurDataURL": "data:image/webp;base64,UklGRjgAAABXRUJQVlA4ICwAAACwAgCdASoYABAAPxFysFAsJqSisAgBgCIJaQAAeyAA/vBTiSC+xPh+DgAAAA==",
           "exif": "Canon EOS 5D Mark II · 200mm · f/9 · 1/40 · ISO 125"
+        }
+      ]
+    },
+    {
+      "slug": "national-day-celebrations-2025",
+      "title": "National Day Celebrations 2025",
+      "year": "2025",
+      "photos": [
+        {
+          "src": "/photos/national-day-celebrations-2025/img005.webp",
+          "width": 2560,
+          "height": 1707,
+          "blurDataURL": "data:image/webp;base64,UklGRnwAAABXRUJQVlA4IHAAAADwAwCdASoYABAAPxFysFCsJqSisAgBgCIJQBjehDdmcVzpKPAxWfqAAP7jD+ge8BPXLOCfowCBR0IaOobcqXsNY3TiV36KkogQItpzrgBIeBQLuH4XjBRMqq8NQbJ1u/d6a1vvAyUt1E5ciWxweQAA",
+          "exif": "Canon EOS 5D Mark II · 70mm · f/7.1 · 1/200 · ISO 2000"
+        },
+        {
+          "src": "/photos/national-day-celebrations-2025/img006.webp",
+          "width": 2560,
+          "height": 1707,
+          "blurDataURL": "data:image/webp;base64,UklGRrgAAABXRUJQVlA4IKwAAABwBACdASoYABAAPxFysFAsJqSisAgBgCIJagCdAywTkQsborYSyWCsPfYzHADNbzCxSR/L9/qlZFOAfgDtkQ5M9r+4RKhFjrjta6bNC3R/YoxvLkPOxaJ8B88XCtgTikW45wSP/0uVSprKNJJohLV9O7YbOLmYh30if1YjXCK49+Vl2EKcIWgV3vANQ/r5aS1l+ekZCtSf6n69HMGJ9ZnkueXkYkYBwxMgAAAA",
+          "exif": "Canon EOS 5D Mark II · 70mm · f/4.5 · 1/100 · ISO 2000"
+        },
+        {
+          "src": "/photos/national-day-celebrations-2025/img010.webp",
+          "width": 2560,
+          "height": 1707,
+          "blurDataURL": "data:image/webp;base64,UklGRpIAAABXRUJQVlA4IIYAAADwAwCdASoYABAAPxFysFAsJqSisAgBgCIJYgC/WDZCPOi//ZCpd3f4AP7vSyKg7xXg94YL9ljzViVjmIj4JVfZnS3aQbjEW/SmeE6zR3vItdDY0/rVw5u5exY9RDwZNjxht8sxGhaUsSaA24qyvRiB47t07SVkc5js+FQ1kTboxVxy7igAAA==",
+          "exif": "Canon EOS 5D Mark II · 111mm · f/5 · 1/160 · ISO 6400"
+        },
+        {
+          "src": "/photos/national-day-celebrations-2025/img024.webp",
+          "width": 1707,
+          "height": 2560,
+          "blurDataURL": "data:image/webp;base64,UklGRgwBAABXRUJQVlA4IAABAADQBgCdASoYACQAPxGCtVasKCSjpWmZgCIJYwCuHzCgbJoRDLc/yBbWUap42ZHlq1fdc1f7TtO+2ssZaC6swGAA/sUpnPfzie3GiwB5WokUNoOEKZKl6IuGOQ6W2WfrlP9jvI44a0FNv5h3LiparsoBE+PLG/yFTHDLV9PDV5O+ojKF4HXjm9gY+1oNXqW7U0MXybc9PTAwm1oUsRIEfGAbnkqWbvC0t5b4thrzynYKv8vZUGofgfNcp3YhMlxFImqDhsy3yiKj7cnoRmwfpbfSL9Nx3ek7fIXYn8kMrChQ6UI6XLLQr39c2vMru6OJnxOJkfEc5JRX81Qq+QR/lFwA",
+          "exif": "Canon EOS 5D Mark II · 200mm · f/4 · 1/100 · ISO 4000"
+        }
+      ]
+    },
+    {
+      "slug": "sstride-for-wellness-2026",
+      "title": "SSTride for Wellness 2026",
+      "year": "2026",
+      "photos": [
+        {
+          "src": "/photos/sstride-for-wellness-2026/sstride-2026-edmund-1.webp",
+          "width": 1707,
+          "height": 2560,
+          "blurDataURL": "data:image/webp;base64,UklGRrQAAABXRUJQVlA4IKgAAABwBgCdASoYACQAPwF0sFArJ6UisBqtUWAgCWUAvOAUP04iZ8TWmK9K63IuYYbwlWDWnwT89v6r6YF74gAA+KM9KhIrr5OqvJYE9VIm974bPZFEiLgrK0S4tK2uz3uzfi1hZfqvOJCIymkca7Gyg9Oj+gLas5uCOHNsuauf04WwlR/0M36HrMN/+fMloxrNmaJWOYqgmEagH0Y8DIDVcJeHrTA+HRIgAAA=",
+          "exif": "Canon EOS 5D Mark II · 70mm · f/4 · 1/60 · ISO 800"
+        },
+        {
+          "src": "/photos/sstride-for-wellness-2026/sstride-2026-edmund-13.webp",
+          "width": 2560,
+          "height": 1707,
+          "blurDataURL": "data:image/webp;base64,UklGRqgAAABXRUJQVlA4IJwAAABwBACdASoYABAAPxFysFAsJqSisAgBgCIJZAC7AYy81SfJ+8cTeeGNMn8YIADbUnTD6T1gtf50uNOrSatMtNDH/pgng5+wrfNYLtsLn8awQrRAWS5BnsX/4DkSR4rfWK762CAfudeTl+iiXY/ZNEtkodEiEdWdqvOkXBQBjurCRvSR662gYRxSkR4GkAC00yQVgLGM+K23YjoZQAA=",
+          "exif": "Canon EOS 5D Mark II · 155mm · f/4.5 · 1/200 · ISO 100"
+        },
+        {
+          "src": "/photos/sstride-for-wellness-2026/sstride-2026-edmund-16.webp",
+          "width": 2560,
+          "height": 1707,
+          "blurDataURL": "data:image/webp;base64,UklGRpoAAABXRUJQVlA4II4AAAAQBACdASoYABAAPxFysVCsJqSisAgBgCIJQBdgMYsb6potblu1BklgYAD+7UJfek1ki0KHrmzk/bvrZyOL4xzTkqNaiJu2qqAoqjumGvJB+ewYEpvQfw/PiNA4b8//kteKPo6FNxeSt7U1RPgOuh1UFxwPOe5PvKENFhG5cPx44d+eweHQ6x5MRBJiVYAA",
+          "exif": "Canon EOS 5D Mark II · 70mm · f/7.1 · 1/200 · ISO 100"
+        },
+        {
+          "src": "/photos/sstride-for-wellness-2026/sstride-2026-edmund-2.webp",
+          "width": 1707,
+          "height": 2560,
+          "blurDataURL": "data:image/webp;base64,UklGRrAAAABXRUJQVlA4IKQAAADQBQCdASoYACQAPxGCt1YsKCUjpWmZgCIJZwDI1q7CU8qw0d7/DXK8uPFTqYamMlUSpHrFR5AAAP7nKcSCZAZU9cQ7YZ1E3jb4udNe7p8ooaI3raXd8KwOYErygxY+XtDkTtz7ufsWQAPHnOXg1EUqDHPrYgX6tJKmzjL3B+Rf3nSm/SiyiAJ3V0igI7Es/dGlMSF5a6WU7ZCKpD0Y5aq7MEiAAA==",
+          "exif": "Canon EOS 5D Mark II · 70mm · f/4 · 1/80 · ISO 1250"
+        },
+        {
+          "src": "/photos/sstride-for-wellness-2026/sstride-2026-edmund-29.webp",
+          "width": 2560,
+          "height": 1707,
+          "blurDataURL": "data:image/webp;base64,UklGRqgAAABXRUJQVlA4IJwAAADwAwCdASoYABAAPxFysFAsJqSisAgBgCIJYwC7AYyoT5CdBOcjtt9AANr9BglctZGUYg8jL6NarK2lrz1FDRT5AadCwQQsC/9VZQPlGHsgvCQcPdL1yYj3ro2zDR2HWYD8GQ6DmU7LkpZGPed/dZyGJgr9YgkXl6tM6JgizWBYkUb9xlrz8UBvPFrCkLG0MdhoM/zTK6BDTmgAAAA=",
+          "exif": "Canon EOS 5D Mark II · 85mm · f/4 · 1/200 · ISO 2000"
+        },
+        {
+          "src": "/photos/sstride-for-wellness-2026/sstride-2026-edmund-8.webp",
+          "width": 1707,
+          "height": 2560,
+          "blurDataURL": "data:image/webp;base64,UklGRtgAAABXRUJQVlA4IMwAAADwBQCdASoYACQAPxFyslOsJiQiqrgMAYAiCWQAzfx1bWIxHj/S3zyZFNjwWhUMF5q9ETrHiivHsAD+9wE3MdTvGTdj3t8tB1RJSiim9Bb46n7Mi6Ipcm+Hv59tpRsPWyhELC5d8V1k3UZ4i6L4PNUasLbnfP5fS2+k7rTkjQtiRG1nHW3tVOiH/y2adwxSpScT3Iy3eXy81N0XKDyQMcX/vbaIJ7an0qNkg2qA+CtUXoH6HgK2ocVGdf2LRjE64LOOXaHdQvQJ+6+IqAA=",
+          "exif": "Canon EOS 5D Mark II · 93mm · f/6.3 · 1/200 · ISO 100"
+        },
+        {
+          "src": "/photos/sstride-for-wellness-2026/sstride-2026-edmund-9.webp",
+          "width": 1707,
+          "height": 2560,
+          "blurDataURL": "data:image/webp;base64,UklGRtAAAABXRUJQVlA4IMQAAADwBQCdASoYACQAPxGAtVasJ6SjpWmZgCIJZwDCgF0UmKtnXwj7ge5ts6i8neP1/UzG5FccwSVkgAD+U/Wzdh08NxI+l3tZqhKSOvX5FSQ/Q3PSGfNnOwCS9gdFprS/OeW1x9b0ArTq8T9Oxc/B7jLrR/nq2OZ7sxCdwqz/l89y6JGus8anpSf2K3OGvNDlbEyALK8TvgUc8z4lCQBYhz1BFsfs0qBEjuEFoMkvaEi1Mfq9a+O9k6KXo5xcHWQ2pwdAcAAA",
+          "exif": "Canon EOS 5D Mark II · 144mm · f/6.3 · 1/400 · ISO 100"
         }
       ]
     }
