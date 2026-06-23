@@ -22,6 +22,7 @@ export async function generateMetadata({
   return {
     title: album.title,
     description: `${album.photos.length} photographs from ${album.title} by Edmund Lim.`,
+    alternates: { canonical: `/photos/${slug}` },
   };
 }
 

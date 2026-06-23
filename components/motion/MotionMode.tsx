@@ -40,7 +40,7 @@ export function FxToggle() {
       onClick={toggle}
       aria-pressed={full}
       title="Toggle motion effects"
-      className="cursor-pointer font-mono text-[11px] uppercase tracking-[0.2em] text-ink hover:text-accent transition-colors"
+      className="inline-flex min-h-[48px] cursor-pointer items-center font-mono text-[11px] uppercase tracking-[0.2em] text-ink transition-colors hover:text-accent"
     >
       FX{" "}
       <span className={full ? "text-accent" : "text-dim"}>{full ? "●" : "○"}</span>

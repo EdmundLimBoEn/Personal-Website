@@ -7,6 +7,7 @@ import Reveal from "@/components/motion/Reveal";
 export const metadata: Metadata = {
   title: "Photos",
   description: "Photo albums by Edmund Lim — events, airshows, night skies. Singapore.",
+  alternates: { canonical: "/photos" },
 };
 
 export default function PhotosPage() {

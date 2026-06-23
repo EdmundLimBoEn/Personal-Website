@@ -235,7 +235,7 @@ function About() {
           that scratch my own itches.
         </p>
         <div className="flex flex-col gap-4 font-mono text-xs leading-loose text-dim sm:pt-2">
-          <p>
+          <p className="text-base leading-relaxed">
             Student at the School of Science and Technology, Singapore. Media club
             photographer{count > 0 ? ` — ${count} frames on this site and counting` : ""}.
             When I&apos;m not behind a camera I&apos;m in a terminal, usually with Claude Code
