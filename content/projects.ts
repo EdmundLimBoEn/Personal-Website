@@ -9,7 +9,7 @@ export type Project = {
 };
 
 export const GITHUB_PROFILE = "https://github.com/EdmundLimBoEn";
-export const EMAIL = "limboenedmund@gmail.com";
+export const EMAIL = "me@edmundlim.systems";
 
 export const PROJECTS: Project[] = [
   {
