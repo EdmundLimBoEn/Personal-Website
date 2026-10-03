@@ -132,7 +132,7 @@ function PhotoStrip() {
           <div className="focus-frame flex h-[280px] items-center justify-center border border-dashed border-line sm:h-[360px]">
             <Brackets />
             <p className="font-mono text-xs uppercase tracking-[0.25em] text-faint">
-              [ awaiting curation — {albums.length} albums on the card ]
+              [ picking photos · {albums.length} albums waiting ]
             </p>
           </div>
         </div>
@@ -230,16 +230,14 @@ function About() {
       </Reveal>
       <Reveal delay={0.08} className="grid gap-10 px-6 pb-20 sm:grid-cols-[1.4fr_1fr] sm:px-12">
         <p className="font-display text-3xl leading-snug sm:text-5xl">
-          I photograph whatever catches my{" "}
-          <span className="italic text-accent">eye</span> — and ship small tools
-          that scratch my own itches.
+          Random <span className="italic text-accent">photos</span> and small tools.
         </p>
         <div className="flex flex-col gap-4 font-mono text-xs leading-loose text-dim sm:pt-2">
           <p className="text-base leading-relaxed">
             Student at the School of Science and Technology, Singapore. Media club
-            photographer{count > 0 ? ` — ${count} frames on this site and counting` : ""}.
-            When I&apos;m not behind a camera I&apos;m in a terminal, usually with Claude Code
-            open.
+            photographer{count > 0 ? ` with ${count} photos on this site and counting` : ""}.
+            When I&apos;m not taking photos, I&apos;m usually sitting behind my Mac with Grokbot
+            or Codex open.
           </p>
           <div className="flex flex-col gap-1 uppercase tracking-[0.15em]">
             <a href={`mailto:${EMAIL}`} className="hover:text-accent transition-colors">

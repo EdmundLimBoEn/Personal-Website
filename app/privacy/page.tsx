@@ -21,7 +21,7 @@ export default function PrivacyPage() {
       <p>
         This site sets <strong>no cookies</strong> and uses no client-side storage to track
         you across visits. Because nothing identifying is stored on your device, there is no
-        cookie-consent banner — there is nothing to consent to.
+        cookie-consent banner.
       </p>
 
       <h2>Analytics</h2>
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
 
       <h2>Photographs</h2>
       <p>
-        All photos published here have their embedded metadata removed during processing —
+        All photos published here have their embedded metadata removed during processing,
         including <strong>GPS location, camera serial numbers, and timestamps</strong>. Images
         are served as optimised WebP from this domain.
       </p>

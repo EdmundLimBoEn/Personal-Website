@@ -5,7 +5,7 @@ import { EMAIL } from "@/content/projects";
 export const metadata: Metadata = {
   title: "Terms of Use",
   description:
-    "Terms of use for edmundlim.systems — content ownership, acceptable use, and disclaimer for this personal portfolio site.",
+    "Terms of use for edmundlim.systems. Content ownership, acceptable use and disclaimers.",
   alternates: { canonical: "/terms" },
 };
 
@@ -13,8 +13,8 @@ export default function TermsPage() {
   return (
     <LegalPage title="Terms" updated="June 2026">
       <p>
-        By using <strong>edmundlim.systems</strong> you agree to these terms. They are
-        deliberately short — this is a personal portfolio, not a commercial service.
+        By using <strong>edmundlim.systems</strong> you agree to these terms. This is
+        a personal portfolio, so I&apos;ve kept them short.
       </p>
 
       <h2>Content &amp; ownership</h2>

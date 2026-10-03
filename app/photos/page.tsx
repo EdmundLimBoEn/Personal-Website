@@ -6,7 +6,7 @@ import Reveal from "@/components/motion/Reveal";
 
 export const metadata: Metadata = {
   title: "Photos",
-  description: "Photo albums by Edmund Lim — events, airshows, night skies. Singapore.",
+  description: "Photo albums by Edmund Lim, a student and media club photographer in Singapore.",
   alternates: { canonical: "/photos" },
 };
 
@@ -18,7 +18,7 @@ export default function PhotosPage() {
         Photo<span className="italic font-light">s</span>
       </h1>
       <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.25em] text-dim">
-        {albums.length} album{albums.length === 1 ? "" : "s"} · curated picks only
+        {albums.length} album{albums.length === 1 ? "" : "s"} · a few favourites
       </p>
 
       {albums.length === 0 ? (
@@ -28,7 +28,7 @@ export default function PhotosPage() {
           <span className="bracket bl" />
           <span className="bracket br" />
           <p className="px-6 text-center font-mono text-xs uppercase tracking-[0.25em] text-faint">
-            [ no albums yet — the card is still in the camera ]
+            [ no albums yet ]
           </p>
         </div>
       ) : (

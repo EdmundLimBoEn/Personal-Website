@@ -31,17 +31,17 @@ const plex = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Edmund Lim — photographer · vibe coder · tech enthusiast",
-    template: "%s — Edmund Lim",
+    default: "Edmund Lim · photographer · vibe coder · tech enthusiast",
+    template: "%s · Edmund Lim",
   },
   description:
-    "Edmund Lim — a Singapore event photographer and developer. Browse a photography portfolio and small, practical tools built to scratch my own itches.",
+    "Photos and small tools by Edmund Lim, a student and media club photographer in Singapore.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     title: "Edmund Lim",
-    description: "Photographer · vibe coder · tech enthusiast — Singapore.",
+    description: "Photographer · vibe coder · tech enthusiast · Singapore.",
     url: SITE_URL,
     siteName: "Edmund Lim",
     type: "website",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Edmund Lim",
-    description: "Photographer · vibe coder · tech enthusiast — Singapore.",
+    description: "Photographer · vibe coder · tech enthusiast · Singapore.",
     creator: "@edmundlimboen",
     site: "@edmundlimboen",
   },
@@ -67,7 +67,7 @@ const jsonLd = {
       url: SITE_URL,
       jobTitle: "Photographer & Developer",
       description:
-        "Singapore event photographer and developer building small, practical tools.",
+        "Student and media club photographer in Singapore who builds small tools.",
       knowsAbout: ["Event photography", "Web development", "Software engineering"],
       email: `mailto:${EMAIL}`,
       sameAs: [GITHUB_PROFILE, "https://x.com/edmundlimboen"],
@@ -81,7 +81,7 @@ const jsonLd = {
       "@type": "ProfilePage",
       "@id": `${SITE_URL}/#profilepage`,
       url: SITE_URL,
-      name: "Edmund Lim — photographer · vibe coder · tech enthusiast",
+      name: "Edmund Lim · photographer · vibe coder · tech enthusiast",
       mainEntity: { "@id": `${SITE_URL}/#person` },
     },
   ],

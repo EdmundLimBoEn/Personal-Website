@@ -5,7 +5,7 @@ import { EMAIL } from "@/content/projects";
 export const metadata: Metadata = {
   title: "Accessibility",
   description:
-    "Accessibility statement for edmundlim.systems — conformance goals, reduced-motion support, and how to report an issue.",
+    "Accessibility on edmundlim.systems, including reduced-motion support and how to report an issue.",
   alternates: { canonical: "/accessibility" },
 };
 
@@ -14,8 +14,7 @@ export default function AccessibilityPage() {
     <LegalPage title="Accessibility" updated="June 2026">
       <p>
         I want this site to be usable by as many people as possible and aim to meet{" "}
-        <strong>WCAG 2.1 AA</strong> where practical. Accessibility is an ongoing effort, not a
-        finished checkbox.
+        <strong>WCAG 2.1 AA</strong> where practical. I&apos;m still working on it.
       </p>
 
       <h2>What&apos;s in place</h2>
@@ -23,11 +22,11 @@ export default function AccessibilityPage() {
         <li>Semantic HTML, descriptive alt text on photographs, and keyboard-navigable links.</li>
         <li>
           Full support for <strong>prefers-reduced-motion</strong>: the film grain, scroll
-          animations, 3D scenes, and custom cursor all stand down when you ask your system to
+          animations, 3D scenes, and custom cursor are turned off when you ask your system to
           reduce motion.
         </li>
         <li>Touch targets sized for comfortable tapping on mobile.</li>
-        <li>A persistent &quot;FX&quot; switch in the navigation to keep the calmer experience.</li>
+        <li>A persistent &quot;FX&quot; switch in the navigation to turn motion effects on or off.</li>
       </ul>
 
       <h2>Known limitations</h2>

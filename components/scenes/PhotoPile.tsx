@@ -360,7 +360,7 @@ export default function PhotoPile({ prints }: { prints: PrintPhoto[] }) {
         ref={wrap}
         data-cursor="drag"
         className="relative h-[78svh] overflow-hidden"
-        aria-label="Interactive pile of photo prints — drag to toss, click to open the album"
+        aria-label="Interactive pile of photo prints. Drag to toss, click to open the album."
       >
         <Canvas
           dpr={[1, 1.75]}
@@ -389,7 +389,7 @@ export default function PhotoPile({ prints }: { prints: PrintPhoto[] }) {
       </div>
 
       <p className="px-6 pb-10 pt-4 font-mono text-[10px] uppercase tracking-[0.2em] text-faint sm:px-12">
-        loose prints — drag to toss · click one to open its album · flip gravity ↑
+        drag the prints · click one to open its album · toggle gravity ↑
       </p>
     </section>
   );

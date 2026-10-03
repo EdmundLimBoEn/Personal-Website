@@ -16,25 +16,26 @@ export const PROJECTS: Project[] = [
     slug: "s2-05-timetable",
     name: "s2-05-timetable",
     tagline:
-      "Live school timetable PWA — now bar, exam countdowns, announcements, offline support. Used daily by my class.",
+      "My class timetable, with the current lesson, exam countdowns, announcements and offline support. We use it every day.",
     stack: ["vanilla js", "express", "pwa"],
     year: "2026",
     live: "https://timetable.edmundlim.systems",
     github: "https://github.com/EdmundLimBoEn/s2-05-timetable",
   },
   {
-    slug: "ikeyboard",
-    name: "iKeyboard",
+    slug: "stage-wand",
+    name: "Stage Wand",
     tagline:
-      "Turns an iPhone into a wireless keyboard and trackpad for the Mac over Wi-Fi — Bonjour discovery, low-latency TCP, CGEvent injection.",
-    stack: ["swift", "swiftui", "bonjour"],
+      "Turns your phone into a presentation clicker and trackpad over Wi-Fi or Bluetooth. Use the volume buttons to change slides on Mac, Windows or Linux.",
+    stack: ["swift", "go", "kotlin"],
     year: "2026",
+    github: "https://github.com/EdmundLimBoEn/stage-wand",
   },
   {
     slug: "mts-converter",
     name: "mts-converter",
     tagline:
-      "macOS app that digs AVCHD .MTS files out of JVC camcorder cards and converts them to H.265 MP4 at ~30% of the size.",
+      "A macOS app that pulls .MTS clips off JVC camcorder cards and converts them to H.265 MP4 at about 30% of the original size.",
     stack: ["python", "tkinter", "ffmpeg"],
     year: "2026",
     github: "https://github.com/EdmundLimBoEn/mts-converter",
@@ -43,16 +44,16 @@ export const PROJECTS: Project[] = [
     slug: "server-dashboard",
     name: "server-dashboard",
     tagline:
-      "Self-hosted single-page monitor for my Linux home server — CPU, RAM, disk, temps and fans over Tailscale.",
+      "A dashboard for my Linux home server. I check CPU, RAM, disk space, temperatures and fans over Tailscale.",
     stack: ["fastapi", "psutil", "docker"],
     year: "2025",
     github: "https://github.com/EdmundLimBoEn/server-dashboard",
   },
- {
+  {
     slug: "statusline-builder",
     name: "statusline-builder",
     tagline:
-      "The bash + jq statusline this site was built under — model, git, burn rate and context meter on one line of my Claude Code terminal.",
+      "My Claude Code statusline, built with bash and jq. Shows the model, git status, spending rate and context usage in one line.",
     stack: ["bash", "jq"],
     year: "2025",
   },

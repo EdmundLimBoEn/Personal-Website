@@ -69,7 +69,7 @@ export default function Gallery({
           className="lightbox-enter fixed inset-0 z-[60] flex flex-col bg-bg"
           role="dialog"
           aria-modal="true"
-          aria-label={`${albumTitle} — photo viewer`}
+          aria-label={`${albumTitle} · photo viewer`}
         >
           <div className="flex items-center justify-between px-5 py-4 font-mono text-[11px] uppercase tracking-[0.2em] text-dim">
             <span>
