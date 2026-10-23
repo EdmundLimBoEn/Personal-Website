@@ -169,6 +169,15 @@ summary {
   body.has-custom-cursor * {
     cursor: none !important;
   }
+  /* Native modals sit above the custom cursor in the browser's top layer. */
+  body.has-custom-cursor dialog:modal,
+  body.has-custom-cursor dialog:modal * {
+    cursor: default !important;
+  }
+  body.has-custom-cursor dialog:modal button,
+  body.has-custom-cursor dialog:modal button * {
+    cursor: pointer !important;
+  }
 }
 .vf-cursor {
   position: fixed;
