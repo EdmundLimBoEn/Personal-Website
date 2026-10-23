@@ -4,7 +4,11 @@ import { readFileSync } from 'node:fs';
 import { act, createElement as h, StrictMode } from 'react';
 import { renderToString } from 'react-dom/server';
 
-const window = new Window({ url: 'http://localhost' });
+const window = new Window({
+  url: 'http://localhost',
+  settings: { disableIframePageLoading: true, disableCSSFileLoading: true },
+});
+
 for (const key of ['window', 'document', 'HTMLElement', 'HTMLDialogElement', 'Event', 'KeyboardEvent', 'PointerEvent', 'localStorage']) {
   globalThis[key] = key === 'window' ? window : window[key];
 }
