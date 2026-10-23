@@ -58,7 +58,7 @@ function makeChipTexture(text: string, accent = false) {
   ctx.strokeStyle = accent ? "rgba(77,159,255,0.9)" : "rgba(236,233,226,0.45)";
   ctx.lineWidth = scale;
   ctx.strokeRect(scale / 2, scale / 2, w - scale, h - scale);
-  ctx.fillStyle = accent ? "#4d9fff" : "#ece9e2";
+  ctx.fillStyle = accent ? "#ff4d24" : "#ece9e2";
   ctx.font = `500 ${13 * scale}px "${family}", monospace`;
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
