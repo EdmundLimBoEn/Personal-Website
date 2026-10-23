@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -13,7 +13,7 @@ function usePointerWorld() {
   const vp = useRef({ viewport, size });
   vp.current = { viewport, size };
 
-  useMemo(() => {
+  useEffect(() => {
     if (typeof window === "undefined") return;
     const onMove = (e: PointerEvent) => {
       const { viewport, size } = vp.current;
@@ -27,6 +27,11 @@ function usePointerWorld() {
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("pointerdown", onMove, { passive: true });
     document.addEventListener("pointerout", onLeave);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerdown", onMove);
+      document.removeEventListener("pointerout", onLeave);
+    };
   }, []);
   return ptr;
 }
@@ -50,7 +55,7 @@ function makeChipTexture(text: string, accent = false) {
   c.width = w;
   c.height = h;
   ctx.clearRect(0, 0, w, h);
-  ctx.strokeStyle = accent ? "rgba(255,77,36,0.9)" : "rgba(236,233,226,0.45)";
+  ctx.strokeStyle = accent ? "rgba(77,159,255,0.9)" : "rgba(236,233,226,0.45)";
   ctx.lineWidth = scale;
   ctx.strokeRect(scale / 2, scale / 2, w - scale, h - scale);
   ctx.fillStyle = accent ? "#ff4d24" : "#ece9e2";

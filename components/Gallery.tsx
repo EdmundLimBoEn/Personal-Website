@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Reveal from "@/components/motion/Reveal";
 import type { Photo } from "@/lib/photos";
@@ -12,7 +12,9 @@ export default function Gallery({
   photos: Photo[];
   albumTitle: string;
 }) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState<number | null>(null);
+  const isOpen = open !== null;
 
   const step = useCallback(
     (dir: 1 | -1) => {
@@ -24,9 +26,12 @@ export default function Gallery({
   );
 
   useEffect(() => {
-    if (open === null) return;
+    if (!isOpen) return;
+    const dialog = dialogRef.current!;
+    const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    dialog.showModal();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(null);
       if (e.key === "ArrowRight") step(1);
       if (e.key === "ArrowLeft") step(-1);
     };
@@ -34,9 +39,11 @@ export default function Gallery({
     document.body.style.overflow = "hidden";
     return () => {
       window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
+      dialog.close();
+      document.body.style.overflow = previousOverflow;
+      if (previousFocus instanceof HTMLElement) previousFocus.focus();
     };
-  }, [open, step]);
+  }, [isOpen, step]);
 
   return (
     <>
@@ -65,10 +72,10 @@ export default function Gallery({
       </div>
 
       {open !== null && (
-        <div
-          className="lightbox-enter fixed inset-0 z-[60] flex flex-col bg-bg"
-          role="dialog"
-          aria-modal="true"
+        <dialog
+          ref={dialogRef}
+          onCancel={() => setOpen(null)}
+          className="lightbox-enter fixed inset-0 z-[60] m-0 flex h-dvh max-h-none w-screen max-w-none flex-col border-0 bg-bg p-0 text-ink"
           aria-label={`${albumTitle} · photo viewer`}
         >
           <div className="flex items-center justify-between px-5 py-4 font-mono text-[11px] uppercase tracking-[0.2em] text-dim">
@@ -114,7 +121,7 @@ export default function Gallery({
               next →
             </button>
           </div>
-        </div>
+        </dialog>
       )}
     </>
   );

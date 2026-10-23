@@ -14,16 +14,27 @@ export function useMotionMode() {
 /** Site-wide FX switch. Calm by default; "full" unlocks the showpiece motion. */
 export function MotionProvider({ children }: { children: React.ReactNode }) {
   const [full, setFull] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setFull(localStorage.getItem("motion-fx") === "1");
+    try {
+      setFull(localStorage.getItem("motion-fx") === "1");
+    } catch {
+      // Persistence may be disabled; keep the in-memory default.
+    }
+    setLoaded(true);
   }, []);
 
-  const toggle = () =>
-    setFull((f) => {
-      localStorage.setItem("motion-fx", f ? "0" : "1");
-      return !f;
-    });
+  useEffect(() => {
+    if (!loaded) return;
+    try {
+      localStorage.setItem("motion-fx", full ? "1" : "0");
+    } catch {
+      // The FX switch still works when storage is unavailable.
+    }
+  }, [full, loaded]);
+
+  const toggle = () => setFull((f) => !f);
 
   return (
     <MotionModeContext.Provider value={{ full, toggle }}>
