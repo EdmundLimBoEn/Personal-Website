@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "photos": "bun run scripts/import-photos.ts"
+    "photos": "bun run scripts/import-photos.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "photos:clear": "bun run scripts/import-photos.ts --clear"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

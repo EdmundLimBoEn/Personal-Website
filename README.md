@@ -28,6 +28,13 @@ which is generated from a curated set of originals:
 3. Commit `content/photos.json` and `public/photos/` — both are checked in so
    builds are deterministic.
 
+Imports reject empty or colliding album/image slugs before writing output. Missing
+originals or conversion failures leave the published catalogue intact. Replacements
+are staged and validated before publication. To intentionally remove all published
+photos and empty the catalogue, run `bun run photos:clear`.
+
+Concurrent imports share an exclusive `.photos.lock`; a competing import fails immediately. After a crashed import, remove the lock directory only after confirming no import is running.
+
 Folders named `close ups` (any spelling) are refused by a hard-coded denylist and
 will never be published.
 
