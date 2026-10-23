@@ -42,3 +42,7 @@ next-env.d.ts
 
 # curated photo originals (large; processed copies live in public/photos)
 /photos-src/
+
+# Photo import/build coordination and unpublished staging
+/.photos.lock/
+/.photos-stage-*/

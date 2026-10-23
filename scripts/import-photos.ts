@@ -12,16 +12,14 @@
  *
  * Usage: bun run photos
  */
-import { mkdir, readdir, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
 import exifr from "exifr";
+import { withPhotoLock } from "./photo-lock";
 
 const ROOT = path.join(import.meta.dirname, "..");
-const SRC_DIR = path.join(ROOT, "photos-src");
-const OUT_DIR = path.join(ROOT, "public", "photos");
-const MANIFEST = path.join(ROOT, "content", "photos.json");
 
 const MAX_EDGE = 2560;
 const QUALITY = 85;
@@ -77,9 +75,7 @@ async function readExif(file: string): Promise<{ line?: string; year?: string }>
   }
 }
 
-async function processPhoto(srcFile: string, outDir: string, slug: string): Promise<Photo> {
-  const base = path.basename(srcFile).replace(IMAGE_EXT, "");
-  const outName = `${slugify(base)}.webp`;
+async function processPhoto(srcFile: string, outDir: string, slug: string, outName: string): Promise<Photo> {
   const outFile = path.join(outDir, outName);
 
   // .rotate() bakes in EXIF orientation; no .withMetadata() => all metadata stripped.
@@ -106,67 +102,111 @@ async function processPhoto(srcFile: string, outDir: string, slug: string): Prom
   };
 }
 
-async function main() {
-  if (!existsSync(SRC_DIR)) {
-    console.log(`No ${path.relative(ROOT, SRC_DIR)}/ directory — writing empty manifest.`);
-    await writeFile(MANIFEST, JSON.stringify({ albums: [] }, null, 2) + "\n");
-    return;
-  }
-
-  const entries = (await readdir(SRC_DIR, { withFileTypes: true }))
+// Resolve and validate the complete plan before creating any output.
+async function planImport(root: string) {
+  const source = path.join(root, "photos-src");
+  const output = path.join(root, "public", "photos");
+  const entries = (await readdir(source, { withFileTypes: true }))
     .filter((e) => e.isDirectory() && !e.name.startsWith("."))
-    .map((e) => e.name)
-    .sort((a, b) => a.localeCompare(b));
-
-  const albums: Album[] = [];
-
-  for (const dirName of entries) {
-    if (DENYLIST.test(dirName.trim())) {
-      console.warn(`✗ REFUSED "${dirName}" — this folder is on the denylist and will not be published.`);
+    .map((e) => e.name).sort((a, b) => a.localeCompare(b));
+  const slugs = new Set<string>();
+  const plan = [];
+  for (const title of entries) {
+    if (DENYLIST.test(title.trim())) {
+      console.warn(`✗ REFUSED "${title}" — this folder is on the denylist.`);
       continue;
     }
-    const slug = slugify(dirName);
-    const albumSrc = path.join(SRC_DIR, dirName);
-    const outDir = path.join(OUT_DIR, slug);
-    await rm(outDir, { recursive: true, force: true });
-    await mkdir(outDir, { recursive: true });
-
-    const files = (await readdir(albumSrc))
+    const slug = slugify(title);
+    const relative = path.relative(output, path.resolve(output, slug));
+    if (!slug || !relative || relative.startsWith("..") || path.isAbsolute(relative)) {
+      throw new Error(`Invalid album slug: ${title}`);
+    }
+    if (slugs.has(slug)) throw new Error(`Duplicate album slug: ${slug}`);
+    slugs.add(slug);
+    const names = new Set<string>();
+    const files = (await readdir(path.join(source, title)))
       .filter((f) => IMAGE_EXT.test(f) && !f.startsWith("."))
-      .sort((a, b) => a.localeCompare(b));
-
-    if (files.length === 0) continue;
-
-    const photos: Photo[] = [];
-    let year: string | undefined;
-    for (const f of files) {
-      const srcFile = path.join(albumSrc, f);
-      try {
-        const photo = await processPhoto(srcFile, outDir, slug);
-        if (!year) year = (await readExif(srcFile)).year;
-        photos.push(photo);
-        console.log(`  ✓ ${dirName}/${f} → ${photo.width}×${photo.height}`);
-      } catch (err) {
-        console.error(`  ✗ ${dirName}/${f}: ${err}`);
-      }
-    }
-    if (photos.length > 0) albums.push({ slug, title: dirName, year, photos });
+      .sort((a, b) => a.localeCompare(b)).map((file) => {
+        const base = slugify(file.replace(IMAGE_EXT, ""));
+        if (!base) throw new Error(`Invalid image slug: ${title}/${file}`);
+        const outName = `${base}.webp`;
+        if (names.has(outName)) throw new Error(`Duplicate image filename: ${title}/${outName}`);
+        names.add(outName);
+        return { source: path.join(source, title, file), outName };
+      });
+    plan.push({ title, slug, files });
   }
-
-  // Remove output dirs for albums that no longer exist in photos-src/.
-  if (existsSync(OUT_DIR)) {
-    const keep = new Set(albums.map((a) => a.slug));
-    for (const e of await readdir(OUT_DIR, { withFileTypes: true })) {
-      if (e.isDirectory() && !keep.has(e.name)) {
-        await rm(path.join(OUT_DIR, e.name), { recursive: true, force: true });
-        console.log(`  – removed stale album output: ${e.name}`);
-      }
-    }
-  }
-
-  await writeFile(MANIFEST, JSON.stringify({ albums }, null, 2) + "\n");
-  const total = albums.reduce((n, a) => n + a.photos.length, 0);
-  console.log(`\nManifest written: ${albums.length} album(s), ${total} photo(s).`);
+  return plan;
 }
 
-main();
+export async function importPhotos(root = ROOT, clear = false) {
+  await withPhotoLock(root, async () => {
+    // A missing source is an error. Only the explicit clear operation bypasses it.
+    const plan = clear ? [] : await planImport(root);
+    const stage = await mkdtemp(path.join(root, ".photos-stage-"));
+    const stagedPhotos = path.join(stage, "photos");
+    const output = path.join(root, "public", "photos");
+    const manifest = path.join(root, "content", "photos.json");
+    const backup = path.join(stage, "previous-photos");
+    let backedUp = false;
+    let installed = false;
+    let preserveBackup = false;
+    try {
+      await mkdir(stagedPhotos);
+      const albums: Album[] = [];
+      for (const { title, slug, files } of plan) {
+        if (!files.length) continue;
+        const outDir = path.join(stagedPhotos, slug);
+        await mkdir(outDir);
+        const photos: Photo[] = [];
+        let year: string | undefined;
+        for (const file of files) {
+          const photo = await processPhoto(file.source, outDir, slug, file.outName);
+          if (!year) year = (await readExif(file.source)).year;
+          photos.push(photo);
+        }
+        albums.push({ slug, title, year, photos });
+      }
+      // Every manifest reference must resolve to a nonempty generated file.
+      for (const album of albums) {
+        for (const photo of album.photos) {
+          const file = await stat(path.join(stage, photo.src.slice(1)));
+          if (!file.isFile() || !file.size) throw new Error(`Missing generated image: ${photo.src}`);
+        }
+      }
+      const stagedManifest = path.join(stage, "photos.json");
+      await writeFile(stagedManifest, JSON.stringify({ albums }, null, 2) + "\n");
+      await mkdir(path.dirname(output), { recursive: true });
+      await mkdir(path.dirname(manifest), { recursive: true });
+      try {
+        if (existsSync(output)) {
+          await rename(output, backup);
+          backedUp = true;
+        }
+        await rename(stagedPhotos, output);
+        installed = true;
+        // Last publication step: atomic manifest replacement.
+        await rename(stagedManifest, manifest);
+      } catch (error) {
+        try {
+          if (installed) await rm(output, { recursive: true, force: true });
+          if (backedUp) await rename(backup, output);
+        } catch (rollbackError) {
+          preserveBackup = true;
+          throw new AggregateError([error, rollbackError], `Rollback failed; backup retained at ${stage}`);
+        }
+        throw error;
+      }
+      console.log(`Manifest written: ${albums.length} album(s).`);
+    } finally {
+      if (!preserveBackup) await rm(stage, { recursive: true, force: true });
+    }
+  });
+}
+
+if (path.resolve(process.argv[1] ?? "") === path.resolve(import.meta.filename)) {
+  importPhotos(ROOT, process.argv.includes("--clear")).catch((error) => {
+    console.error(`Photo import failed: ${error.message}`);
+    process.exitCode = 1;
+  });
+}
