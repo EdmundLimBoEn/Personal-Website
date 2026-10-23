@@ -1,0 +1,3 @@
+`npm test` runs React lifecycle regression tests with Bun and Happy DOM. The GPU renderer and Next image component are stubbed; React effects, state, event registration, and CSS are exercised directly, including StrictMode.
+
+For native browser focus containment and background inertness, run `npm run build` then `npm run test:browser`. Install Chromium with `node node_modules/playwright-core/cli.js install chromium`, or set `CHROMIUM_PATH` to an existing Chromium executable. `TEST_BASE_URL` can target an already running local server. Happy DOM does not implement native modal focus behavior, so that behavior is covered separately by the browser test.

@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "photos": "bun run scripts/import-photos.ts"
+    "photos": "bun run scripts/import-photos.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test tests/components.test.mjs",
+    "test:browser": "node --test tests/gallery.browser.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
@@ -27,6 +30,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.184.1",
+    "happy-dom": "20.14.6",
+    "playwright-core": "1.63.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
