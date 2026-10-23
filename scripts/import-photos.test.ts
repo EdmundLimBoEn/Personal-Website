@@ -51,6 +51,16 @@ for (const [label, files, error] of [
   }));
 }
 
+for (const title of ["Close Ups", "Close.Ups", "Close–Ups", "Close_Up", "CloseUps"]) {
+  test(`privacy denylist refuses ${title} while publishing allowed albums`, () => fixture(async (root) => {
+    await originals(root, [`${title}/private.png`, "Landscapes/public.png"], true);
+    await importPhotos(root);
+    const manifest = JSON.parse(await readFile(path.join(root, "content/photos.json"), "utf8"));
+    assert.deepEqual(manifest.albums.map((album: { slug: string }) => album.slug), ["landscapes"]);
+    assert.deepEqual(await readdir(path.join(root, "public/photos")), ["landscapes"]);
+  }));
+}
+
 test("missing originals preserve the catalogue and images", () => fixture(async (root) => {
   await assert.rejects(importPhotos(root), /ENOENT/);
   await unchanged(root);
@@ -115,4 +125,3 @@ test("CLI failures exit nonzero and preserve previous output", () => fixture(asy
     await unchanged(root);
   }
 }));
-

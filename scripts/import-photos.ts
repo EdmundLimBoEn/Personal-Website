@@ -26,7 +26,7 @@ const QUALITY = 85;
 const IMAGE_EXT = /\.(jpe?g|png|webp)$/i;
 
 // Folders that must never be published, however they're spelled.
-const DENYLIST = /^close[\s_-]*ups?$/i;
+const DENYLIST = /^close-?ups?$/;
 
 type Photo = {
   src: string;
@@ -112,11 +112,11 @@ async function planImport(root: string) {
   const slugs = new Set<string>();
   const plan = [];
   for (const title of entries) {
-    if (DENYLIST.test(title.trim())) {
+    const slug = slugify(title);
+    if (DENYLIST.test(slug)) {
       console.warn(`✗ REFUSED "${title}" — this folder is on the denylist.`);
       continue;
     }
-    const slug = slugify(title);
     const relative = path.relative(output, path.resolve(output, slug));
     if (!slug || !relative || relative.startsWith("..") || path.isAbsolute(relative)) {
       throw new Error(`Invalid album slug: ${title}`);

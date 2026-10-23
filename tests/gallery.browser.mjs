@@ -33,6 +33,29 @@ async function withPage(options, run) {
   try { await run(await context.newPage()); } finally { await context.close(); }
 }
 
+test('normal-motion desktop gallery restores native modal cursors', async () => {
+  await withPage({ reducedMotion: 'no-preference', hasTouch: false }, async page => {
+    await page.goto('/photos/football');
+    await page.waitForFunction(() => document.body.classList.contains('has-custom-cursor'));
+    assert.equal(await page.evaluate(() => matchMedia('(pointer: fine)').matches), true);
+    const opener = page.getByRole('button', { name: /^Open photo 1 of/ });
+    assert.equal(await opener.evaluate(el => getComputedStyle(el).cursor), 'none');
+    await opener.click();
+    const dialog = page.getByRole('dialog');
+    await dialog.waitFor();
+    assert.equal(await dialog.evaluate(el => el.matches(':modal')), true);
+    assert.equal(await dialog.evaluate(el => getComputedStyle(el).cursor), 'default');
+    assert.equal(await dialog.locator('img').evaluate(el => getComputedStyle(el).cursor), 'default');
+    for (const button of await dialog.getByRole('button').all()) {
+      await button.hover();
+      assert.equal(await button.evaluate(el => getComputedStyle(el).cursor), 'pointer');
+    }
+    await page.keyboard.press('Escape');
+    await dialog.waitFor({ state: 'detached' });
+    assert.equal(await opener.evaluate(el => getComputedStyle(el).cursor), 'none');
+  });
+});
+
 test('gallery contains focus, blocks background focus, navigates and restores the opener', async () => {
   await withPage({ reducedMotion: 'reduce' }, async page => {
     await page.goto('/photos/football');
