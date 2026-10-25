@@ -115,12 +115,18 @@ test("CLI failures exit nonzero and preserve previous output", () => fixture(asy
   await cp(path.join(import.meta.dirname, "import-photos.ts"), path.join(root, "scripts/import-photos.ts"), { recursive: true });
   await cp(path.join(import.meta.dirname, "photo-lock.ts"), path.join(root, "scripts/photo-lock.ts"));
   await cp(path.join(import.meta.dirname, "photo-publication.ts"), path.join(root, "scripts/photo-publication.ts"));
+  await cp(path.join(import.meta.dirname, "photo-diagnostics.ts"), path.join(root, "scripts/photo-diagnostics.ts"));
   await symlink(path.resolve(import.meta.dirname, "../node_modules"), path.join(root, "node_modules"));
   for (const corrupt of [false, true]) {
     if (corrupt) await originals(root, ["Album/broken.png"]);
     const result = spawnSync(process.execPath, [path.join(root, "scripts/import-photos.ts")], { encoding: "utf8" });
     assert.equal(result.status, 1);
     assert.match(result.stderr, /Photo import failed/);
+    if (!corrupt) {
+      assert.match(result.stderr, /code=ENOENT/);
+      assert.match(result.stderr, /syscall=scandir/);
+      assert.ok(result.stderr.includes(`path=${path.join(root, "photos-src")}`));
+    }
     assert.doesNotMatch(result.stdout, /Manifest written/);
     await unchanged(root);
   }

@@ -14,7 +14,7 @@ async function fixture(run: (root: string) => Promise<void>) {
     await mkdir(path.join(root, "scripts"));
     await mkdir(path.join(root, "node_modules/next/dist/bin"), { recursive: true });
     await cp(path.resolve(import.meta.dirname, "../package.json"), path.join(root, "package.json"));
-    for (const name of ["build.ts", "photo-lock.ts", "photo-publication.ts"]) {
+    for (const name of ["build.ts", "photo-lock.ts", "photo-publication.ts", "photo-diagnostics.ts"]) {
       await cp(path.join(import.meta.dirname, name), path.join(root, "scripts", name));
     }
     // Stand in for Next only; exercise the actual package build command and wrapper.

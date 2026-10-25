@@ -8,6 +8,7 @@ import { publishPhotos, recoverPhotoPublication } from "./photo-publication";
 import { recoverPhotos } from "./recover-photos";
 import { importPhotos } from "./import-photos";
 import { build } from "./build";
+import { formatPhotoError } from "./photo-diagnostics";
 
 async function fixture(run: (root: string, stage: string) => Promise<void>) {
   const root = await fs.mkdtemp(path.join(tmpdir(), "photo-recovery-"));
@@ -61,13 +62,26 @@ for (const checkpoint of [1, 2, 3, 4]) {
 }
 
 test("failed rollback retains state and next import recovers before source validation", () => fixture(async (root, stage) => {
+  const publicationError = Object.assign(new Error("manifest failure"), { code: "EIO", syscall: "rename", path: path.join(stage, "photos.json") });
+  const recoveryError = Object.assign(new Error("rollback failure"), { code: "EACCES", syscall: "rm", path: path.join(root, "public/photos") });
   await assert.rejects(publishPhotos(root, stage, {
     rename: async (from, to) => {
-      if (String(from).endsWith("/photos.json")) throw new Error("manifest failure");
+      if (String(from).endsWith("/photos.json")) throw publicationError;
       return fs.rename(from, to);
     },
-    rm: async () => { throw new Error("rollback failure"); },
-  }), /recovery failed/);
+    rm: async () => { throw recoveryError; },
+  }), (error) => {
+    assert.ok(error instanceof AggregateError);
+    assert.deepEqual(error.errors, [publicationError, recoveryError]);
+    const diagnostic = formatPhotoError(error);
+    assert.match(diagnostic, /Photo recovery failed/);
+    for (const cause of [publicationError, recoveryError]) {
+      assert.ok(diagnostic.includes(`code=${cause.code}`));
+      assert.ok(diagnostic.includes(`syscall=${cause.syscall}`));
+      assert.ok(diagnostic.includes(`path=${cause.path}`));
+    }
+    return true;
+  });
   await assert.rejects(importPhotos(root), /ENOENT/);
   await matching(root, "old");
 }));
@@ -92,7 +106,7 @@ test("committed publication resolves with a cleanup warning and can retry partia
       rm: async (target, options) => {
         if (target === stage) {
           await fs.rm(path.join(stage, "previous-photos"), { recursive: true, force: true });
-          throw new Error("cleanup failure");
+          throw Object.assign(new Error("cleanup failure"), { code: "EACCES", syscall: "rmdir", path: path.join(stage, "previous-photos") });
         }
         return fs.rm(target, options);
       },
@@ -100,6 +114,9 @@ test("committed publication resolves with a cleanup warning and can retry partia
   } finally { console.warn = warn; }
   assert.match(warnings.join("\n"), /publication succeeded; cleanup pending/);
   assert.ok(warnings[0].includes(stage));
+  assert.match(warnings[0], /code=EACCES/);
+  assert.match(warnings[0], /syscall=rmdir/);
+  assert.ok(warnings[0].includes(`path=${path.join(stage, "previous-photos")}`));
   await matching(root, "new");
   await recoverPhotos(root);
   await matching(root, "new");
@@ -149,3 +166,39 @@ test("invalid recovery state blocks build and stale-lock removal", () => fixture
   assert.ok((await fs.stat(path.join(root, ".photos.lock"))).isDirectory());
   await matching(root, "old");
 }));
+
+test("rollback cleanup preserves the underlying error as its cause", () => fixture(async (root, stage) => {
+  await crash(root, stage, 3);
+  const failure = Object.assign(new Error("cleanup denied"), { code: "EPERM", syscall: "rmdir", path: stage });
+  await assert.rejects(recoverPhotoPublication(root, {
+    rename: fs.rename,
+    rm: async (target, options) => {
+      if (target === stage) throw failure;
+      return fs.rm(target, options);
+    },
+  }), (error) => {
+    assert.ok(error instanceof Error);
+    assert.equal(error.cause, failure);
+    assert.match(formatPhotoError(error), /code=EPERM syscall=rmdir/);
+    return true;
+  });
+  await matching(root, "old");
+}));
+
+test("diagnostics bound large and cyclic error graphs without dumping arbitrary properties", () => {
+  const leaf = Object.assign(new Error("failure\n" + "x".repeat(10000)), {
+    code: "EIO", syscall: "rename", path: "p".repeat(10000), dest: "d".repeat(10000),
+    privateData: "must not be logged",
+  });
+  const error = new AggregateError(Array.from({ length: 100 }, () => new Error("y".repeat(10000), { cause: leaf })), "recovery failed", { cause: leaf });
+  leaf.cause = error;
+  const diagnostic = formatPhotoError(error);
+  assert.ok(diagnostic.length <= 4096);
+  assert.match(diagnostic, /code=EIO syscall=rename path=/);
+  assert.ok(diagnostic.includes("dest="));
+  assert.ok(diagnostic.includes("…"));
+  assert.ok(!diagnostic.includes("\n"));
+  assert.ok(!diagnostic.includes("must not be logged"));
+  assert.ok(!diagnostic.includes("x".repeat(241)));
+  assert.ok(diagnostic.split("; caused by: ").length <= 6);
+});

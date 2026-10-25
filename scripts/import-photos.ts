@@ -18,6 +18,7 @@ import sharp from "sharp";
 import exifr from "exifr";
 import { withPhotoLock } from "./photo-lock";
 import { hasPhotoTransaction, publishPhotos } from "./photo-publication";
+import { formatPhotoError } from "./photo-diagnostics";
 
 const ROOT = path.join(import.meta.dirname, "..");
 
@@ -184,7 +185,7 @@ export async function importPhotos(root = ROOT, clear = false) {
 
 if (path.resolve(process.argv[1] ?? "") === path.resolve(import.meta.filename)) {
   importPhotos(ROOT, process.argv.includes("--clear")).catch((error) => {
-    console.error(`Photo import failed: ${error.message}`);
+    console.error(`Photo import failed: ${formatPhotoError(error)}`);
     process.exitCode = 1;
   });
 }

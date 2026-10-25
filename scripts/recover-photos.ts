@@ -2,6 +2,7 @@ import { mkdir, rmdir } from "node:fs/promises";
 import path from "node:path";
 import { recoverPhotoPublication } from "./photo-publication";
 import { withPhotoLock } from "./photo-lock";
+import { formatPhotoError } from "./photo-diagnostics";
 
 export async function recoverPhotos(root: string, staleLock = false) {
   if (!staleLock) return withPhotoLock(root, async () => {});
@@ -16,5 +17,5 @@ export async function recoverPhotos(root: string, staleLock = false) {
 
 if (path.resolve(process.argv[1] ?? "") === path.resolve(import.meta.filename)) {
   recoverPhotos(path.join(import.meta.dirname, ".."), process.argv.includes("--stale-lock"))
-    .catch((error) => { console.error(error.message); process.exitCode = 1; });
+    .catch((error) => { console.error(formatPhotoError(error)); process.exitCode = 1; });
 }
