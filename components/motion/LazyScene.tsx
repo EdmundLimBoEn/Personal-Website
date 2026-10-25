@@ -1,5 +1,6 @@
 "use client";
 
+import { useMotionOK } from "./useMotionOK";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { useMotionMode } from "./MotionMode";
@@ -15,14 +16,6 @@ export type PrintPhoto = {
   album: string;
   title: string;
 };
-
-function useMotionOK() {
-  const [ok, setOk] = useState(false);
-  useEffect(() => {
-    setOk(!window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  }, []);
-  return ok;
-}
 
 /** Transparent WebGL layer over the hero; unmounts once scrolled past.
  *  Calm mode: cursor-reactive particles only. Full mode: + HUD chips & brackets. */
