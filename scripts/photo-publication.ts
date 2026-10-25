@@ -1,6 +1,7 @@
 import * as fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { formatPhotoError } from "./photo-diagnostics";
 
 type IO = Pick<typeof fs, "rename" | "rm">;
 const journalName = ".photos-transaction.json";
@@ -31,9 +32,9 @@ export async function recoverPhotoPublication(root: string, io: IO = fs) {
   try {
     await io.rm(stage, { recursive: true, force: true });
     if (committed) await io.rm(journal);
-  } catch {
-    if (!committed) throw new Error(`Photo rollback succeeded; staging cleanup failed at ${stage}`);
-    console.warn(`Photo publication succeeded; cleanup pending at ${stage}. Run bun run photos:recover to retry.`);
+  } catch (error) {
+    if (!committed) throw new Error(`Photo rollback succeeded; staging cleanup failed at ${stage}`, { cause: error });
+    console.warn(formatPhotoError(new Error(`Photo publication succeeded; cleanup pending at ${stage}. Run bun run photos:recover to retry.`, { cause: error })));
     return false;
   }
   return true;

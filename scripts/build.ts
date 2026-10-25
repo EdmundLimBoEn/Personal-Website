@@ -2,6 +2,7 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { constants } from "node:os";
 import path from "node:path";
 import { withPhotoLock } from "./photo-lock";
+import { formatPhotoError } from "./photo-diagnostics";
 
 export async function build(root: string, args: string[] = []) {
   let child: ChildProcess | undefined;
@@ -40,5 +41,5 @@ export async function build(root: string, args: string[] = []) {
 if (path.resolve(process.argv[1] ?? "") === path.resolve(import.meta.filename)) {
   build(path.join(import.meta.dirname, ".."), process.argv.slice(2))
     .then((code) => { process.exitCode = code; })
-    .catch((error) => { console.error(`Build failed: ${error.message}`); process.exitCode = 1; });
+    .catch((error) => { console.error(`Build failed: ${formatPhotoError(error)}`); process.exitCode = 1; });
 }
