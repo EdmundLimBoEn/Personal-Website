@@ -33,7 +33,7 @@ originals or conversion failures leave the published catalogue intact. Replaceme
 are staged and validated before publication. To intentionally remove all published
 photos and empty the catalogue, run `bun run photos:clear`.
 
-Concurrent imports share an exclusive `.photos.lock`; a competing import fails immediately. After a crashed import, remove the lock directory only after confirming no import is running.
+Imports and production builds (`bun run build`) share an exclusive `.photos.lock`; a competing import or build fails immediately. Use this build entry point so the lock is held until Next.js exits. After a crashed import or build, remove the lock directory only after confirming no import or build is running.
 
 Folders named `close ups` (any spelling) are refused by a hard-coded denylist and
 will never be published.
