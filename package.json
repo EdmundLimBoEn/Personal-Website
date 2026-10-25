@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "bun test",
     "test:browser": "node --test tests/gallery.browser.mjs",
-    "photos:clear": "bun run scripts/import-photos.ts --clear"
+    "photos:clear": "bun run scripts/import-photos.ts --clear",
+    "photos:recover": "bun run scripts/recover-photos.ts"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

@@ -12,12 +12,12 @@
  *
  * Usage: bun run photos
  */
-import { mkdir, mkdtemp, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { mkdir, mkdtemp, readdir, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import exifr from "exifr";
 import { withPhotoLock } from "./photo-lock";
+import { hasPhotoTransaction, publishPhotos } from "./photo-publication";
 
 const ROOT = path.join(import.meta.dirname, "..");
 
@@ -147,10 +147,6 @@ export async function importPhotos(root = ROOT, clear = false) {
     const stagedPhotos = path.join(stage, "photos");
     const output = path.join(root, "public", "photos");
     const manifest = path.join(root, "content", "photos.json");
-    const backup = path.join(stage, "previous-photos");
-    let backedUp = false;
-    let installed = false;
-    let preserveBackup = false;
     try {
       await mkdir(stagedPhotos);
       const albums: Album[] = [];
@@ -178,28 +174,10 @@ export async function importPhotos(root = ROOT, clear = false) {
       await writeFile(stagedManifest, JSON.stringify({ albums }, null, 2) + "\n");
       await mkdir(path.dirname(output), { recursive: true });
       await mkdir(path.dirname(manifest), { recursive: true });
-      try {
-        if (existsSync(output)) {
-          await rename(output, backup);
-          backedUp = true;
-        }
-        await rename(stagedPhotos, output);
-        installed = true;
-        // Last publication step: atomic manifest replacement.
-        await rename(stagedManifest, manifest);
-      } catch (error) {
-        try {
-          if (installed) await rm(output, { recursive: true, force: true });
-          if (backedUp) await rename(backup, output);
-        } catch (rollbackError) {
-          preserveBackup = true;
-          throw new AggregateError([error, rollbackError], `Rollback failed; backup retained at ${stage}`);
-        }
-        throw error;
-      }
+      await publishPhotos(root, stage);
       console.log(`Manifest written: ${albums.length} album(s).`);
     } finally {
-      if (!preserveBackup) await rm(stage, { recursive: true, force: true });
+      if (!hasPhotoTransaction(root)) await rm(stage, { recursive: true, force: true });
     }
   });
 }

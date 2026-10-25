@@ -12,13 +12,13 @@ async function fixture(run: (root: string) => Promise<void>) {
   const root = await mkdtemp(path.join(tmpdir(), "photo-build-test-"));
   try {
     await mkdir(path.join(root, "scripts"));
-    await mkdir(path.join(root, "node_modules/.bin"), { recursive: true });
+    await mkdir(path.join(root, "node_modules/next/dist/bin"), { recursive: true });
     await cp(path.resolve(import.meta.dirname, "../package.json"), path.join(root, "package.json"));
-    for (const name of ["build.ts", "photo-lock.ts"]) {
+    for (const name of ["build.ts", "photo-lock.ts", "photo-publication.ts"]) {
       await cp(path.join(import.meta.dirname, name), path.join(root, "scripts", name));
     }
     // Stand in for Next only; exercise the actual package build command and wrapper.
-    await writeFile(path.join(root, "node_modules/.bin/next"), `#!${process.execPath}
+    await writeFile(path.join(root, "node_modules/next/dist/bin/next"), `#!${process.execPath}
 const fs = require("node:fs");
 fs.writeFileSync("build-started", JSON.stringify(process.argv.slice(2)));
 if (process.argv.includes("--hold")) {
@@ -75,16 +75,13 @@ test("package build holds the lock until the child exits, excluding imports", ()
   const child = spawn(process.execPath, ["run", "build", "--hold"], { cwd: root, stdio: "pipe" });
   const closed = once(child, "close");
   try {
-    await new Promise<void>((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error("Build did not become ready")), 10000);
-      let output = "";
-      child.stdout.on("data", (data) => {
-        output += data;
-        if (output.includes("build ready")) { clearTimeout(timer); resolve(); }
-      });
-      child.once("error", (error) => { clearTimeout(timer); reject(error); });
-      child.once("close", () => { clearTimeout(timer); reject(new Error("Build exited before ready")); });
-    });
+    // File readiness also works when Bun buffers inherited child stdout.
+    const deadline = Date.now() + 3000;
+    while (!existsSync(path.join(root, "build-started"))) {
+      assert.equal(child.exitCode, null, "Build exited before ready");
+      assert.ok(Date.now() < deadline, "Build did not become ready");
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
     await assert.rejects(importPhotos(root, true), /already locked/);
   } finally {
     await writeFile(path.join(root, "build-finish"), "");
