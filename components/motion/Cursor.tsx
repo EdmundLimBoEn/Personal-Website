@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useMotionOK } from "./useMotionOK";
+import { useEffect, useRef } from "react";
 
 const DEFAULT_SIZE = 34;
 /** Don't snap brackets onto targets bigger than this (px). */
@@ -12,19 +13,15 @@ const MAX_SNAP = 360;
  * Desktop only — mounted when (pointer: fine) and motion is allowed.
  */
 export default function Cursor() {
-  const [enabled, setEnabled] = useState(false);
+  const ok = useMotionOK();
+  const enabled = ok && window.matchMedia("(pointer: fine)").matches;
   const frame = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (
-      !window.matchMedia("(pointer: fine)").matches ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    )
-      return;
-    setEnabled(true);
+    if (!enabled) return;
     document.body.classList.add("has-custom-cursor");
     return () => document.body.classList.remove("has-custom-cursor");
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
     if (!enabled) return;

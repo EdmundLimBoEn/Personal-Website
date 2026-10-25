@@ -1,5 +1,6 @@
 "use client";
 
+import { useMotionOK } from "./useMotionOK";
 import { useEffect, useRef } from "react";
 import { useMotionMode } from "./MotionMode";
 
@@ -16,16 +17,13 @@ export default function FloatingLetters({
   className?: string;
 }) {
   const { full } = useMotionMode();
+  const ok = useMotionOK();
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const root = ref.current;
     if (!root || !full) return;
-    if (
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-      !window.matchMedia("(pointer: fine)").matches
-    )
-      return;
+    if (!ok || !window.matchMedia("(pointer: fine)").matches) return;
 
     const letters = Array.from(root.children) as HTMLElement[];
     const n = letters.length;
@@ -79,7 +77,7 @@ export default function FloatingLetters({
       cancelAnimationFrame(raf);
       for (const l of letters) l.style.transform = "";
     };
-  }, [full]);
+  }, [full, ok]);
 
   return (
     <span ref={ref} className={className} aria-hidden="true">

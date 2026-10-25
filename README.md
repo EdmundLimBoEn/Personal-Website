@@ -34,8 +34,9 @@ are staged and validated before publication. To intentionally remove all publish
 photos and empty the catalogue, run `bun run photos:clear`.
 
 Imports and `bun run build` share an exclusive `.photos.lock` and recover any
-unfinished `.photos-transaction.json` before starting. Use this build command rather
-than invoking `next build` directly. Publication records its staging location before
+unfinished `.photos-transaction.json` before starting. A competing import or build
+fails immediately; the build holds the lock until Next.js closes. Use this build
+command rather than invoking `next build` directly. Publication records its staging location before
 moving images; recovery restores the previous images if the manifest was not
 replaced, or keeps the new publication if it was. Recovery can be retried if interrupted.
 

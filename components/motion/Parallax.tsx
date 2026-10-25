@@ -1,5 +1,6 @@
 "use client";
 
+import { useMotionOK } from "./useMotionOK";
 import { useEffect, useRef } from "react";
 
 /**
@@ -16,12 +17,13 @@ export default function Parallax({
   speed?: number;
   className?: string;
 }) {
+  const ok = useMotionOK();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!ok) return;
 
     let raf = 0;
     const update = () => {
@@ -36,8 +38,9 @@ export default function Parallax({
     return () => {
       window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(raf);
+      el.style.transform = "";
     };
-  }, [speed]);
+  }, [speed, ok]);
 
   return (
     <div ref={ref} className={`will-change-transform ${className}`}>
