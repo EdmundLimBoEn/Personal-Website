@@ -33,6 +33,37 @@ async function withPage(options, run) {
   try { await run(await context.newPage()); } finally { await context.close(); }
 }
 
+test('normal-motion modal isolates background wheel scrolling and restores scrolling on close', async () => {
+  await withPage({ reducedMotion: 'no-preference', hasTouch: false, viewport: { width: 1000, height: 600 } }, async page => {
+    await page.goto('/photos/football');
+    await page.waitForFunction(() => document.documentElement.classList.contains('lenis'));
+    await page.mouse.move(500, 300);
+    await page.mouse.wheel(0, 200);
+    await page.waitForFunction(() => window.scrollY > 0);
+    const opener = page.getByRole('button', { name: /^Open photo 1 of/ });
+    for (const close of ['Escape', 'button']) {
+      await opener.click();
+      const dialog = page.getByRole('dialog');
+      await dialog.waitFor();
+      await page.waitForTimeout(500);
+      const position = await page.evaluate(() => window.scrollY);
+      await dialog.locator('img').hover();
+      for (const delta of [350, -350]) {
+        await page.mouse.wheel(0, delta);
+        await page.waitForTimeout(500);
+        assert.equal(await page.evaluate(() => window.scrollY), position);
+      }
+      if (close === 'Escape') await page.keyboard.press('Escape');
+      else await dialog.getByRole('button', { name: /esc \/ close/ }).click();
+      await dialog.waitFor({ state: 'detached' });
+      const afterClose = await page.evaluate(() => window.scrollY);
+      await page.mouse.move(500, 300);
+      await page.mouse.wheel(0, 200);
+      await page.waitForFunction(previous => window.scrollY > previous, afterClose);
+    }
+  });
+});
+
 test('normal-motion desktop gallery restores native modal cursors', async () => {
   await withPage({ reducedMotion: 'no-preference', hasTouch: false }, async page => {
     await page.goto('/photos/football');

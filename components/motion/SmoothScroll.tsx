@@ -4,6 +4,7 @@ import { useMotionOK } from "./useMotionOK";
 import { useEffect } from "react";
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
+import { registerSmoothScroll } from "./scrollLock";
 
 export default function SmoothScroll() {
   const ok = useMotionOK();
@@ -15,7 +16,11 @@ export default function SmoothScroll() {
       lerp: 0.22,
       wheelMultiplier: 1.25,
     });
-    return () => lenis.destroy();
+    const unregister = registerSmoothScroll(lenis);
+    return () => {
+      unregister();
+      lenis.destroy();
+    };
   }, [ok]);
   return null;
 }

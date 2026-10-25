@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Reveal from "@/components/motion/Reveal";
+import { lockSmoothScroll } from "@/components/motion/scrollLock";
 import type { Photo } from "@/lib/photos";
 
 export default function Gallery({
@@ -31,6 +32,7 @@ export default function Gallery({
     const previousFocus = document.activeElement;
     const previousOverflow = document.body.style.overflow;
     dialog.showModal();
+    const unlockSmoothScroll = lockSmoothScroll();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") step(1);
       if (e.key === "ArrowLeft") step(-1);
@@ -41,6 +43,7 @@ export default function Gallery({
       window.removeEventListener("keydown", onKey);
       dialog.close();
       document.body.style.overflow = previousOverflow;
+      unlockSmoothScroll();
       if (previousFocus instanceof HTMLElement) previousFocus.focus();
     };
   }, [isOpen, step]);

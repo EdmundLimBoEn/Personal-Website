@@ -168,7 +168,13 @@ test('gallery opens a native modal, keeps it open when stepping, and restores fo
 
 const lenisInstances = [];
 mock.module('lenis', () => ({ default: class {
-  constructor() { this.destroy = mock(() => {}); lenisInstances.push(this); }
+  constructor() {
+    this.isStopped = false;
+    this.stop = mock(() => { this.isStopped = true; });
+    this.start = mock(() => { this.isStopped = false; });
+    this.destroy = mock(() => {});
+    lenisInstances.push(this);
+  }
 } }));
 mock.module('next/dynamic', () => ({ default: () => () => h('canvas') }));
 const { default: SmoothScroll } = await import('../components/motion/SmoothScroll');
@@ -177,6 +183,58 @@ const { default: Parallax } = await import('../components/motion/Parallax');
 const { default: Magnetic } = await import('../components/motion/Magnetic');
 const { default: FloatingLetters } = await import('../components/motion/FloatingLetters');
 const { LazyHeroScene, LazyPhotoPile } = await import('../components/motion/LazyScene');
+
+for (const initiallyStopped of [false, true]) {
+  for (const closeVia of ['cancel', 'button', 'unmount']) {
+    test(`gallery restores Lenis state (stopped=${initiallyStopped}, close=${closeVia})`, async () => {
+      const host = await mount(h('div', null, h(SmoothScroll), h(Gallery, {
+        photos: [1, 2].map(i => ({ src: `/photo${i}.webp`, width: 100, height: 100, blurDataURL: '' })),
+        albumTitle: 'Test',
+      })));
+      const lenis = lenisInstances.at(-1);
+      if (initiallyStopped) lenis.stop();
+      await act(() => host.querySelector('button').click());
+      expect(lenis.isStopped).toBe(true);
+      await act(() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' })));
+      expect(lenis.isStopped).toBe(true);
+      expect(lenis.start).not.toHaveBeenCalled();
+      await act(() => {
+        if (closeVia === 'cancel') host.querySelector('dialog').dispatchEvent(new Event('cancel', { cancelable: true }));
+        else if (closeVia === 'button') host.querySelector('dialog button').click();
+        // Remove only the gallery so its cleanup must restore the surviving Lenis.
+        else roots.at(-1).render(h(StrictMode, null, h('div', null, h(SmoothScroll))));
+      });
+      expect(lenis.isStopped).toBe(initiallyStopped);
+      expect(lenis.start).toHaveBeenCalledTimes(initiallyStopped ? 0 : 1);
+    });
+  }
+}
+
+test('Lenis created after motion is enabled stays stopped until the gallery closes', async () => {
+  const listeners = new Set();
+  const query = {
+    matches: true,
+    addEventListener: (_, fn) => listeners.add(fn),
+    removeEventListener: (_, fn) => listeners.delete(fn),
+  };
+  spyOn(window, 'matchMedia').mockReturnValue(query);
+  const host = await mount(h('div', null, h(SmoothScroll), h(Gallery, {
+    photos: [{ src: '/photo.webp', width: 100, height: 100, blurDataURL: '' }], albumTitle: 'Test',
+  })));
+  await act(() => host.querySelector('button').click());
+  for (let cycle = 0; cycle < 2; cycle++) {
+    await act(() => { query.matches = false; for (const listener of listeners) listener(); });
+    expect(lenisInstances.at(-1).isStopped).toBe(true);
+    if (cycle === 0) {
+      await act(() => { query.matches = true; for (const listener of listeners) listener(); });
+      expect(lenisInstances.at(-1).destroy).toHaveBeenCalledTimes(1);
+      expect(lenisInstances.at(-1).start).not.toHaveBeenCalled();
+    }
+  }
+  const lenis = lenisInstances.at(-1);
+  await act(() => host.querySelector('dialog button').click());
+  expect(lenis.isStopped).toBe(false);
+});
 
 const motionGlobals = ['requestAnimationFrame', 'cancelAnimationFrame', 'innerWidth', 'innerHeight'];
 const originalMotionGlobals = motionGlobals.map(key => Object.getOwnPropertyDescriptor(globalThis, key));
