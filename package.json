@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "bun run scripts/build.ts",
     "start": "next start",
     "photos": "bun run scripts/import-photos.ts",
     "typecheck": "tsc --noEmit",

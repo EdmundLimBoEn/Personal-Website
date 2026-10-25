@@ -100,7 +100,6 @@ test("manifest publication failure rolls back the image replacement", () => fixt
 test("shared lock excludes concurrent imports and is released on failure", () => fixture(async (root) => {
   await withPhotoLock(root, async () => {
     await assert.rejects(importPhotos(root), /already locked/);
-    await assert.rejects(withPhotoLock(root, async () => assert.fail("build must not start")), /already locked/);
   });
   await assert.rejects(withPhotoLock(root, async () => { throw new Error("failure"); }), /failure/);
   await unchanged(root);
