@@ -246,7 +246,7 @@ function ScrollShake({
 
 /* ---------------- gravity toggle side-effects ---------------- */
 
-function GravityFX({
+export function GravityFX({
   gravityOn,
   bodies,
 }: {
@@ -278,16 +278,19 @@ function GravityFX({
   }, [gravityOn]);
 
   // tiny wandering currents so the zero-G float never fully settles
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (gravityOn) return;
     const t = state.clock.elapsedTime;
+    // Preserve the original 60 FPS strength regardless of display refresh rate.
+    // Match Rapier's delta cap so resuming a suspended tab cannot cause a large kick.
+    const frameScale = Math.min(Math.max(delta, 0), 0.5) * 60;
     bodies.current.forEach((b, i) => {
       if (!b) return;
       const m = b.mass();
       b.applyImpulse(
         {
-          x: Math.sin(t * 0.6 + i * 2.1) * 0.012 * m,
-          y: Math.cos(t * 0.5 + i * 1.3) * 0.012 * m,
+          x: Math.sin(t * 0.6 + i * 2.1) * 0.012 * m * frameScale,
+          y: Math.cos(t * 0.5 + i * 1.3) * 0.012 * m * frameScale,
           z: 0,
         },
         true
