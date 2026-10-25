@@ -1,7 +1,7 @@
 import { afterEach, expect, mock, spyOn, test } from 'bun:test';
 import { Window } from 'happy-dom';
 import { readFileSync } from 'node:fs';
-import { act, createElement as h, StrictMode } from 'react';
+import { act, createElement as h, StrictMode, Children, useEffect } from 'react';
 import { renderToString } from 'react-dom/server';
 
 const window = new Window({
@@ -15,9 +15,30 @@ for (const key of ['window', 'document', 'HTMLElement', 'HTMLDialogElement', 'Ev
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createRoot } = await import('react-dom/client');
 
+// Preserve component lifecycles while replacing Three host objects with fragments.
+const sceneComponents = new Map();
+const sceneResources = new Set();
+function SceneHost({ children, map, material }) {
+  useEffect(() => {
+    if (map) sceneResources.add(map);
+    if (material) sceneResources.add(material);
+  }, [map, material]);
+  return renderScene(children);
+}
+function renderScene(children) {
+  return Children.map(children, child => {
+    if (!child || typeof child !== 'object') return child;
+    if (typeof child.type !== 'function') return h(SceneHost, child.props);
+    if (!sceneComponents.has(child.type)) {
+      const Component = child.type;
+      sceneComponents.set(Component, props => renderScene(Component(props)));
+    }
+    return h(sceneComponents.get(child.type), child.props);
+  });
+}
 // Exercise the real Scene hooks without requiring a GPU renderer.
 mock.module('@react-three/fiber', () => ({
-  Canvas: ({ children }) => { children.type(children.props); return null; },
+  Canvas: ({ children }) => renderScene(children),
   useThree: () => ({ viewport: { width: 8, height: 6 }, size: { width: 800, height: 600 } }),
   useFrame: () => {},
 }));
@@ -76,6 +97,38 @@ test('hero has no render-time listeners and releases all listeners on five Stric
     window.dispatchEvent(new PointerEvent('pointermove', { clientX: 400, clientY: 300 }));
     await act(() => roots.pop().unmount());
     expect(active.map(s => s.size)).toEqual([0, 0, 0]);
+  }
+});
+
+test('hero releases owned textures and shared bracket materials on FX toggles and unmount', async () => {
+  const originalComputedStyle = globalThis.getComputedStyle;
+  globalThis.getComputedStyle = window.getComputedStyle.bind(window);
+  spyOn(window.HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
+    measureText: text => ({ width: text.length * 24 }),
+    clearRect() {}, strokeRect() {}, fillText() {},
+  });
+  try {
+    await mount(h(HeroScene, { full: false }));
+    const root = roots.at(-1);
+    const render = full => act(() => root.render(h(StrictMode, null, h(HeroScene, { full }))));
+    for (let cycle = 0; cycle < 4; cycle++) {
+      sceneResources.clear();
+      await render(true);
+      const resources = [...sceneResources];
+      expect(resources.filter(r => r.isCanvasTexture)).toHaveLength(5);
+      // Each corner's two bars share one material.
+      expect(resources.filter(r => r.isMeshBasicMaterial)).toHaveLength(2);
+      const disposals = resources.map(resource => spyOn(resource, 'dispose'));
+      await render(true);
+      for (const dispose of disposals) expect(dispose).not.toHaveBeenCalled();
+      if (cycle === 3) await act(() => roots.pop().unmount());
+      else await render(false);
+      for (const dispose of disposals) expect(dispose).toHaveBeenCalledTimes(1);
+    }
+  } finally {
+    if (originalComputedStyle) globalThis.getComputedStyle = originalComputedStyle;
+    else delete globalThis.getComputedStyle;
+    sceneResources.clear();
   }
 });
 
