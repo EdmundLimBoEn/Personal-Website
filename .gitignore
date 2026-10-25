@@ -46,3 +46,4 @@ next-env.d.ts
 # Photo import/build coordination and unpublished staging
 /.photos.lock/
 /.photos-stage-*/
+/.photos-transaction.json

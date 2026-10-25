@@ -115,6 +115,7 @@ test("explicit clear removes both catalogue and published assets without origina
 test("CLI failures exit nonzero and preserve previous output", () => fixture(async (root) => {
   await cp(path.join(import.meta.dirname, "import-photos.ts"), path.join(root, "scripts/import-photos.ts"), { recursive: true });
   await cp(path.join(import.meta.dirname, "photo-lock.ts"), path.join(root, "scripts/photo-lock.ts"));
+  await cp(path.join(import.meta.dirname, "photo-publication.ts"), path.join(root, "scripts/photo-publication.ts"));
   await symlink(path.resolve(import.meta.dirname, "../node_modules"), path.join(root, "node_modules"));
   for (const corrupt of [false, true]) {
     if (corrupt) await originals(root, ["Album/broken.png"]);
