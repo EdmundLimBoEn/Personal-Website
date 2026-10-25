@@ -37,13 +37,18 @@ function renderScene(children) {
   });
 }
 // Exercise the real Scene hooks without requiring a GPU renderer.
+const frameCallbacks = new Set();
 mock.module('@react-three/fiber', () => ({
   Canvas: ({ children }) => renderScene(children),
   useThree: () => ({ viewport: { width: 8, height: 6 }, size: { width: 800, height: 600 } }),
-  useFrame: () => {},
+  useFrame: callback => useEffect(() => {
+    frameCallbacks.add(callback);
+    return () => frameCallbacks.delete(callback);
+  }, [callback]),
 }));
 mock.module('next/image', () => ({ default: ({ src, alt }) => h('img', { src, alt }) }));
 const { default: HeroScene } = await import('../components/scenes/HeroScene');
+const { GravityFX } = await import('../components/scenes/PhotoPile');
 const { MotionProvider, FxToggle } = await import('../components/motion/MotionMode');
 const { default: Reveal } = await import('../components/motion/Reveal');
 const { default: Gallery } = await import('../components/Gallery');
@@ -72,6 +77,63 @@ afterEach(async () => {
   localStorage.clear();
   observers = [];
   mock.restore();
+});
+
+test('zero-gravity currents deliver consistent impulses per second across frame rates', async () => {
+  const makeBody = mass => ({
+    mass: () => mass,
+    applyImpulse: mock(() => {}),
+    wakeUp() {}, setLinearDamping() {}, setAngularDamping() {}, applyTorqueImpulse() {},
+  });
+  const bodies = { current: [makeBody(1), null, makeBody(3)] };
+  await mount(h(GravityFX, { gravityOn: false, bodies }));
+  expect(frameCallbacks.size).toBe(1);
+  const [frame] = frameCallbacks;
+  const schedules = [30, 60, 120, 144].map(fps => Array(fps).fill(1 / fps));
+  schedules.push(Array.from({ length: 60 }, (_, i) => i % 2 ? 1 / 40 : 1 / 120));
+  for (const deltas of schedules) {
+    for (const body of bodies.current) body?.applyImpulse.mockClear();
+    let elapsedTime = 0;
+    for (const delta of deltas) {
+      elapsedTime += delta;
+      frame({ clock: { elapsedTime } }, delta);
+    }
+    bodies.current.forEach((body, i) => {
+      if (!body) return;
+      expect(body.applyImpulse).toHaveBeenCalledTimes(deltas.length);
+      const total = body.applyImpulse.mock.calls.reduce((sum, [impulse, wake]) => {
+        expect(wake).toBe(true);
+        expect(impulse.z).toBe(0);
+        return { x: sum.x + impulse.x, y: sum.y + impulse.y };
+      }, { x: 0, y: 0 });
+      // Integral of the original 60 FPS current over one second. Allow for
+      // endpoint sampling error, including the coarsest (30 FPS) schedule.
+      const strength = 0.72 * body.mass();
+      const x = strength * (Math.cos(i * 2.1) - Math.cos(0.6 + i * 2.1)) / 0.6;
+      const y = strength * (Math.sin(0.5 + i * 1.3) - Math.sin(i * 1.3)) / 0.5;
+      expect(Math.abs(total.x - x)).toBeLessThan(0.008 * body.mass());
+      expect(Math.abs(total.y - y)).toBeLessThan(0.008 * body.mass());
+    });
+  }
+  // A resumed tab must not accumulate currents for time Rapier does not simulate.
+  for (const delta of [0, 0.5, 60, 3600]) {
+    for (const body of bodies.current) body?.applyImpulse.mockClear();
+    frame({ clock: { elapsedTime: 60 } }, delta);
+    bodies.current.forEach((body, i) => {
+      if (!body) return;
+      expect(body.applyImpulse).toHaveBeenCalledTimes(1);
+      const [impulse, wake] = body.applyImpulse.mock.calls[0];
+      const strength = (delta === 0 ? 0 : 0.36) * body.mass();
+      expect(impulse.x).toBeCloseTo(Math.sin(36 + i * 2.1) * strength, 10);
+      expect(impulse.y).toBeCloseTo(Math.cos(30 + i * 1.3) * strength, 10);
+      expect(impulse.z).toBe(0);
+      expect(wake).toBe(true);
+    });
+  }
+  await act(() => roots.at(-1).render(h(StrictMode, null, h(GravityFX, { gravityOn: true, bodies }))));
+  for (const body of bodies.current) body?.applyImpulse.mockClear();
+  for (const callback of frameCallbacks) callback({ clock: { elapsedTime: 2 } }, 1 / 60);
+  for (const body of bodies.current) if (body) expect(body.applyImpulse).not.toHaveBeenCalled();
 });
 
 test('hero has no render-time listeners and releases all listeners on five StrictMode remounts', async () => {
