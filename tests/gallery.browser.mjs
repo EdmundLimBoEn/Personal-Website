@@ -84,3 +84,21 @@ test('gallery contains focus, blocks background focus, navigates and restores th
     assert.equal(await page.evaluate(() => document.body.style.overflow), '');
   });
 });
+
+test('live reduced-motion changes stop and restart the cursor and smooth scrolling', async () => {
+  await withPage({ reducedMotion: 'no-preference', hasTouch: false }, async page => {
+    await page.goto('/photos/football');
+    const waitForMotion = enabled => page.waitForFunction(expected =>
+      document.body.classList.contains('has-custom-cursor') === expected &&
+      !!document.querySelector('.vf-cursor') === expected &&
+      document.documentElement.classList.contains('lenis') === expected,
+    enabled);
+    await waitForMotion(true);
+    for (let cycle = 0; cycle < 2; cycle++) {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await waitForMotion(false);
+      await page.emulateMedia({ reducedMotion: 'no-preference' });
+      await waitForMotion(true);
+    }
+  });
+});

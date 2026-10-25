@@ -1,5 +1,6 @@
 "use client";
 
+import { useMotionOK } from "./useMotionOK";
 import { useEffect, useRef } from "react";
 import { useMotionMode } from "./MotionMode";
 
@@ -14,6 +15,7 @@ export default function Magnetic({
   className?: string;
 }) {
   const { full } = useMotionMode();
+  const ok = useMotionOK();
   const outer = useRef<HTMLSpanElement>(null);
   const inner = useRef<HTMLSpanElement>(null);
 
@@ -21,11 +23,7 @@ export default function Magnetic({
     const el = outer.current;
     const target = inner.current;
     if (!el || !target || !full) return;
-    if (
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-      !window.matchMedia("(pointer: fine)").matches
-    )
-      return;
+    if (!ok || !window.matchMedia("(pointer: fine)").matches) return;
 
     let tx = 0,
       ty = 0,
@@ -72,7 +70,7 @@ export default function Magnetic({
       cancelAnimationFrame(raf);
       target.style.transform = "";
     };
-  }, [strength, full]);
+  }, [strength, full, ok]);
 
   return (
     <span ref={outer} className={`inline-block ${className}`}>

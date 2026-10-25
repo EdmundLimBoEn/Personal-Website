@@ -165,3 +165,110 @@ test('gallery opens a native modal, keeps it open when stepping, and restores fo
   expect(document.body.style.overflow).toBe('clip');
   expect(close).toHaveBeenCalledTimes(1);
 });
+
+const lenisInstances = [];
+mock.module('lenis', () => ({ default: class {
+  constructor() { this.destroy = mock(() => {}); lenisInstances.push(this); }
+} }));
+mock.module('next/dynamic', () => ({ default: () => () => h('canvas') }));
+const { default: SmoothScroll } = await import('../components/motion/SmoothScroll');
+const { default: Cursor } = await import('../components/motion/Cursor');
+const { default: Parallax } = await import('../components/motion/Parallax');
+const { default: Magnetic } = await import('../components/motion/Magnetic');
+const { default: FloatingLetters } = await import('../components/motion/FloatingLetters');
+const { LazyHeroScene, LazyPhotoPile } = await import('../components/motion/LazyScene');
+
+const motionGlobals = ['requestAnimationFrame', 'cancelAnimationFrame', 'innerWidth', 'innerHeight'];
+const originalMotionGlobals = motionGlobals.map(key => Object.getOwnPropertyDescriptor(globalThis, key));
+afterEach(() => {
+  motionGlobals.forEach((key, i) => {
+    if (originalMotionGlobals[i]) Object.defineProperty(globalThis, key, originalMotionGlobals[i]);
+    else delete globalThis[key];
+  });
+});
+
+for (const initiallyReduced of [false, true]) {
+  test(`live reduced motion stops/restarts effects and releases subscriptions (initial reduce=${initiallyReduced})`, async () => {
+    const listeners = new Set();
+    const query = {
+      matches: initiallyReduced,
+      addEventListener: (type, fn) => { if (type === 'change') listeners.add(fn); },
+      removeEventListener: (type, fn) => { if (type === 'change') listeners.delete(fn); },
+    };
+    spyOn(window, 'matchMedia').mockImplementation(q => q.includes('prefers-reduced-motion') ? query : { matches: true });
+    const frames = new Map();
+    let frameId = 0;
+    globalThis.requestAnimationFrame = fn => { frames.set(++frameId, fn); return frameId; };
+    globalThis.cancelAnimationFrame = id => frames.delete(id);
+    globalThis.innerWidth = 800;
+    globalThis.innerHeight = 600;
+    const targets = [[window, 'pointermove'], [document, 'pointerout'], [window, 'scroll']];
+    const active = targets.map(() => new Set());
+    for (const target of [window, document]) {
+      const add = target.addEventListener.bind(target);
+      const remove = target.removeEventListener.bind(target);
+      spyOn(target, 'addEventListener').mockImplementation((type, fn, options) => {
+        targets.forEach(([t, name], i) => { if (t === target && name === type) active[i].add(fn); });
+        add(type, fn, options);
+      });
+      spyOn(target, 'removeEventListener').mockImplementation((type, fn, options) => {
+        targets.forEach(([t, name], i) => { if (t === target && name === type) active[i].delete(fn); });
+        remove(type, fn, options);
+      });
+    }
+    lenisInstances.length = 0;
+    localStorage.setItem('motion-fx', '1');
+    const host = await mount(h(MotionProvider, null,
+      h(SmoothScroll), h(Cursor), h(LazyHeroScene),
+      h(LazyPhotoPile, { prints: [{ src: '/test.webp', width: 1, height: 1, album: 'test', title: 'Test' }] }),
+      h(Parallax, { className: 'test-parallax' }, 'Photo'),
+      h(Magnetic, { className: 'test-magnetic' }, 'Link'),
+      h(FloatingLetters, { className: 'test-letters', text: 'Test' }),
+      h(Reveal, null, 'Visible content'),
+    ));
+    await act(() => { for (const observer of observers) observer.callback([{ isIntersecting: true }]); });
+    expect(listeners.size).toBe(8);
+    expect(host.querySelectorAll('canvas').length).toBe(initiallyReduced ? 0 : 2);
+    expect(lenisInstances.length).toBe(initiallyReduced ? 0 : 1);
+    const change = async reduced => {
+      await act(() => {
+        query.matches = reduced;
+        for (const listener of listeners) listener();
+      });
+    };
+    for (let cycle = 0; cycle < 3; cycle++) {
+      await change(false);
+      expect(host.querySelectorAll('canvas').length).toBe(2);
+      expect(host.querySelector('.vf-cursor')).not.toBeNull();
+      expect(document.body.classList.contains('has-custom-cursor')).toBe(true);
+      expect(active.map(s => s.size)).toEqual([2, 1, 1]);
+      expect(lenisInstances.at(-1).destroy).not.toHaveBeenCalled();
+      host.querySelector('.test-magnetic').dispatchEvent(new PointerEvent('pointermove', { clientX: 100, clientY: 100 }));
+      const pending = [...frames.entries()];
+      for (const [id, callback] of pending) { frames.delete(id); callback(100); }
+      expect(host.querySelector('.test-magnetic span').style.transform).not.toBe('');
+      expect(host.querySelector('.test-letters span').style.transform).not.toBe('');
+      await change(true);
+      expect(host.querySelectorAll('canvas').length).toBe(0);
+      expect(host.querySelector('.vf-cursor')).toBeNull();
+      expect(document.body.classList.contains('has-custom-cursor')).toBe(false);
+      expect(active.map(s => s.size)).toEqual([0, 0, 0]);
+      expect(frames.size).toBe(0);
+      for (const instance of lenisInstances) expect(instance.destroy).toHaveBeenCalledTimes(1);
+      for (const selector of ['.test-parallax', '.test-magnetic span', '.test-letters span']) {
+        expect(host.querySelector(selector).style.transform).toBe('');
+      }
+      host.querySelector('.test-magnetic').dispatchEvent(new PointerEvent('pointermove'));
+      expect(frames.size).toBe(0);
+      expect(host.querySelector('.reveal').classList.contains('reveal-ready')).toBe(false);
+    }
+    await change(false);
+    await act(() => roots.pop().unmount());
+    expect(listeners.size).toBe(0);
+    expect(frames.size).toBe(0);
+    expect(active.map(s => s.size)).toEqual([0, 0, 0]);
+    expect(document.body.classList.contains('has-custom-cursor')).toBe(false);
+    for (const instance of lenisInstances) expect(instance.destroy).toHaveBeenCalledTimes(1);
+    for (const observer of observers) expect(observer.disconnect).toHaveBeenCalled();
+  });
+}

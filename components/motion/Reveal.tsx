@@ -1,5 +1,6 @@
 "use client";
 
+import { useMotionOK } from "./useMotionOK";
 import { useEffect, useRef } from "react";
 
 export default function Reveal({
@@ -11,15 +12,13 @@ export default function Reveal({
   delay?: number;
   className?: string;
 }) {
+  const ok = useMotionOK();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      el.classList.add("in");
-      return;
-    }
+    if (!ok) return;
     if (!("IntersectionObserver" in window)) return;
     const io = new IntersectionObserver(
       ([entry]) => {
@@ -36,7 +35,7 @@ export default function Reveal({
       io.disconnect();
       el.classList.remove("reveal-ready");
     };
-  }, []);
+  }, [ok]);
 
   return (
     <div
