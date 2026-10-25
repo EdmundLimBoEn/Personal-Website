@@ -58,7 +58,7 @@ function makeChipTexture(text: string, accent = false) {
   ctx.strokeStyle = accent ? "rgba(77,159,255,0.9)" : "rgba(236,233,226,0.45)";
   ctx.lineWidth = scale;
   ctx.strokeRect(scale / 2, scale / 2, w - scale, h - scale);
-  ctx.fillStyle = accent ? "#ff4d24" : "#ece9e2";
+  ctx.fillStyle = accent ? "#4d9fff" : "#ece9e2";
   ctx.font = `500 ${13 * scale}px "${family}", monospace`;
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
@@ -120,6 +120,7 @@ function Floater({
 
 function Chip({ text, accent = false }: { text: string; accent?: boolean }) {
   const { tex, aspect } = useMemo(() => makeChipTexture(text, accent), [text, accent]);
+  useEffect(() => () => tex.dispose(), [tex]);
   const h = 0.34;
   return (
     <mesh>
@@ -137,6 +138,7 @@ function BracketCorner({ flip = [1, 1] }: { flip?: [number, number] }) {
     () => new THREE.MeshBasicMaterial({ color: "#ece9e2", transparent: true, opacity: 0.55 }),
     []
   );
+  useEffect(() => () => mat.dispose(), [mat]);
   return (
     <group scale={[flip[0], flip[1], 1]}>
       <mesh material={mat} position={[len / 2, 0, 0]}>
