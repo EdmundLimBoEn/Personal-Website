@@ -20,6 +20,11 @@ async function fixture(run: (root: string) => Promise<void>) {
     // Stand in for Next only; exercise the actual package build command and wrapper.
     await writeFile(path.join(root, "node_modules/next/dist/bin/next"), `#!${process.execPath}
 const fs = require("node:fs");
+if (process.argv.includes("--cancel")) {
+  for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
+    process.on(signal, () => fs.writeFileSync("build-cancelled", signal));
+  }
+}
 fs.writeFileSync("build-started", JSON.stringify(process.argv.slice(2)));
 if (process.argv.includes("--hold")) {
   console.log("build ready");
@@ -97,5 +102,40 @@ for (const [arg, status] of [["0", 0], ["23", 23], ["--signal", 143]] as const) 
     assert.equal(result.status, status);
     assert.deepEqual(JSON.parse(await readFile(path.join(root, "build-started"), "utf8")), ["build", arg]);
     assert.equal(existsSync(path.join(root, ".photos.lock")), false);
+  }));
+}
+
+for (const [signal, status] of [["SIGINT", 130], ["SIGTERM", 143], ["SIGHUP", 129]] as const) {
+  test(`wrapper forwards ${signal} and holds the lock until cancellation completes`, () => fixture(async (root) => {
+    // Signal the wrapper itself, independently of package runners/process groups.
+    const wrapper = spawn(process.execPath, ["run", "scripts/build.ts", "--hold", "--cancel"], {
+      cwd: root, stdio: "pipe",
+    });
+    const closed = once(wrapper, "close");
+    async function waitFor(name: string) {
+      const deadline = Date.now() + 3000;
+      while (!existsSync(path.join(root, name))) {
+        assert.equal(wrapper.exitCode, null, "Wrapper exited before child shutdown completed");
+        assert.equal(wrapper.signalCode, null, "Wrapper terminated without waiting for child");
+        assert.ok(Date.now() < deadline, `Timed out waiting for ${name}`);
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+    }
+    try {
+      await waitFor("build-started");
+      assert.equal(wrapper.kill(signal), true);
+      await waitFor("build-cancelled");
+      assert.equal(await readFile(path.join(root, "build-cancelled"), "utf8"), signal);
+      await assert.rejects(importPhotos(root, true), /already locked/);
+      assert.equal(wrapper.exitCode, null);
+      await writeFile(path.join(root, "build-finish"), "");
+      assert.deepEqual(await closed, [status, null]);
+      assert.equal(existsSync(path.join(root, ".photos.lock")), false);
+      await importPhotos(root, true);
+    } finally {
+      // Also let the child exit when testing a broken wrapper that dies early.
+      await writeFile(path.join(root, "build-finish"), "");
+      await closed;
+    }
   }));
 }
